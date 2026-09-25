@@ -1,0 +1,43 @@
+# Empêcher l'accès direct aux fichiers de configuration
+<FilesMatch "^\.env$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+<FilesMatch "^config_installed\.php$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Empêcher l'accès direct aux fichiers sensibles
+<FilesMatch "^functions\.php$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+<FilesMatch "^database_schema\.sql$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Redirection pour les visiteurs non connectés
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Si l'utilisateur n'est pas connecté et accède à index.php, rediriger vers home.php
+    RewriteCond %{REQUEST_URI} ^/index\.php$
+    RewriteCond %{HTTP_COOKIE} !PHPSESSID
+    RewriteRule ^home\.php$ [L]
+    
+    # Rediriger la racine vers home.php pour les visiteurs
+    RewriteCond %{REQUEST_URI} ^/$
+    RewriteRule ^(.*)$ home.php [L]
+</IfModule>
+
+# Réécriture d'URL
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php [QSA,L]
+</IfModule>

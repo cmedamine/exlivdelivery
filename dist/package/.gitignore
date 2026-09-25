@@ -1,0 +1,28 @@
+# Variables d'environnement
+.env
+
+# Logs
+error_log
+*.log
+
+# Uploads
+uploads/*
+!uploads/.gitkeep
+
+# Cache et fichiers temporaires
+vendor/
+composer.lock
+
+# Fichiers de configuration sensibles
+config.php.bak
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db

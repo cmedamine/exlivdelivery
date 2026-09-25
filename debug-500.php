@@ -175,7 +175,7 @@ error_reporting(E_ALL);
         
         // 6. Vérifier le fichier error_log
         echo '<div class="section info">';
-        echo '<h2>6. Logs d'Erreurs</h2>';
+        echo '<h2>6. Logs d\'Erreurs</h2>';
         if (file_exists('error_log')) {
             echo '<p class="status warn">⚠ Fichier error_log existe</p>';
             $log_content = file_get_contents('error_log');
@@ -219,7 +219,7 @@ error_reporting(E_ALL);
         echo '<div class="section ';
         if (empty($issues)) {
             echo 'success">';
-            echo '<h2>✅ Diagnostic Terminé - Pas d'Erreurs Critiques</h2>';
+            echo '<h2>✅ Diagnostic Terminé - Pas d\'Erreurs Critiques</h2>';
             echo '<p>Si vous avez toujours une erreur 500, le problème peut être:</p>';
             echo '<ul>';
             echo '<li>Fichier .htaccess mal configuré</li>';

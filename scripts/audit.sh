@@ -10,8 +10,8 @@ if ! command -v php >/dev/null 2>&1; then
   exit 2
 fi
 
-echo "Running PHP syntax check (php -l) on all .php files (excluding vendor and PHPExcel)..."
-find . -type f -name '*.php' -not -path './vendor/*' -not -path './PHPExcel/*' -print0 | xargs -0 -n1 php -l
+echo "Running PHP syntax check (php -l) on source files (excluding generated dist/, vendor/, and PHPExcel/)..."
+find . -type f -name '*.php' -not -path './dist/*' -not -path './vendor/*' -not -path './PHPExcel/*' -print0 | xargs -0 -n1 php -l
 
 echo "PHP syntax check completed."
 

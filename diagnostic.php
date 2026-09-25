@@ -73,14 +73,14 @@ ini_set('display_errors', 1);
         
         // 3. Vérifier les permissions d'écriture
         echo '<div class="section info">';
-        echo '<h2>3. Permissions d'Écriture</h2>';
+        echo "<h2>3. Permissions d'Écriture</h2>";
         $writableFiles = ['.env', 'config_installed.php', '.htaccess', 'uploads/'];
         foreach ($writableFiles as $file) {
             if (file_exists($file)) {
                 if (is_writable($file)) {
                     echo '<p class="status ok">✓ ' . $file . ' est accessible en écriture</p>';
                 } else {
-                    echo '<p class="status fail">✗ ' . $file . ' n'est pas accessible en écriture</p>';
+                    echo '<p class="status fail">✗ ' . $file . ' n\'est pas accessible en écriture</p>';
                     $issues[] = $file . ' non accessible en écriture';
                 }
             } else {
@@ -98,7 +98,7 @@ ini_set('display_errors', 1);
         
         // 4. Vérifier si déjà installé
         echo '<div class="section info">';
-        echo '<h2>4. État de l'Installation</h2>';
+        echo '<h2>4. État de l\'Installation</h2>';
         if (file_exists('.env')) {
             echo '<p class="status warn">⚠ Le fichier .env existe déjà</p>';
             $warnings[] = 'Installation déjà partiellement effectuée';

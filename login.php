@@ -2,44 +2,38 @@
 session_start();
 include("config.php");
 
-if(isset($_POST['username'])){
-	$back = $bdd->query("SELECT id FROM users WHERE email='".sanitize_vars($_POST['username'])."' AND password='".sanitize_vars($_POST['password'])."'");
-	if($back->rowCount() == 1){
-		$back = $bdd->query("SELECT * FROM users WHERE email='".sanitize_vars($_POST['username'])."' AND password='".sanitize_vars($_POST['password'])."' AND active='on' AND trash='1'");
-		if($back->rowCount() == 1){
-			$row = $back->fetch();
-			$_SESSION['id'] = $row['id'];
-			$_SESSION['fullname'] = $row['fullname'];
-			$_SESSION['picture'] = $row['picture'];
-			$_SESSION['phone'] = $row['phone'];
-			$_SESSION['email'] = $row['email'];
-			$_SESSION['roles'] = $row['roles'];
-			$_SESSION['type'] = $row['type'];
-			$_SESSION['upuser'] = $row['upuser'];
-			
-			session_regenerate_id(true);
-			
-			if($_SESSION['type'] != "moderator"){
-				header('location: commands.php');
-			}
-			else{
-				header('location: index.php');
-			}
-		}
-		else{
-			$error = 'Votre compte n\'est pas active';
-		}
-	}
-	else{
-		$error = 'E-mail ou mot de passe est incorrect';
-	}
-}
+if (isset($_POST['username'], $_POST['password'])) {
+	$email = trim((string) $_POST['username']);
+	$password = (string) $_POST['password'];
+	$account = $bdd->prepare('SELECT * FROM users WHERE email = ? LIMIT 1');
+	$account->execute([$email]);
+	$row = $account->fetch(PDO::FETCH_ASSOC);
 
-function sanitize_vars($var){
-	if(preg_match("#script|select|update|delete|concat|create|table|union|length|show_table|mysql_list_tables|mysql_list_fields|mysql_list_dbs#i",$var)){
-		$var = "";
+	// Support pre-existing plaintext passwords once, then upgrade them to bcrypt.
+	$validPassword = $row && (password_verify($password, $row['password']) || hash_equals((string) $row['password'], $password));
+	if (!$validPassword) {
+		$error = 'E-mail ou mot de passe est incorrect';
+	} elseif ($row['active'] !== 'on' || $row['trash'] !== '1') {
+		$error = 'Votre compte n\'est pas actif';
+	} else {
+		if (!password_verify($password, $row['password'])) {
+			$upgrade = $bdd->prepare('UPDATE users SET password = ? WHERE id = ?');
+			$upgrade->execute([hash_password($password), $row['id']]);
+		}
+
+		$_SESSION['id'] = $row['id'];
+		$_SESSION['fullname'] = $row['fullname'];
+		$_SESSION['picture'] = $row['picture'];
+		$_SESSION['phone'] = $row['phone'];
+		$_SESSION['email'] = $row['email'];
+		$_SESSION['roles'] = $row['roles'];
+		$_SESSION['type'] = $row['type'];
+		$_SESSION['upuser'] = $row['upuser'] ?? null;
+
+		session_regenerate_id(true);
+		header($_SESSION['type'] !== 'moderator' ? 'location: commands.php' : 'location: index.php');
+		exit;
 	}
-	return htmlspecialchars(addslashes(trim($var)));
 }
 
 if(file_exists("configdb.data")){

@@ -78,7 +78,7 @@ if(isset($_SESSION['type'])){
 		$userid = $_SESSION['id'];
 	}
 	$back = $bdd->query("SELECT * FROM parametres WHERE user='".$_SESSION['id']."'");
-	$parametres = $back->fetch();	
+	$parametres = $back->fetch() ?: ['nbrows' => ''];
 }
 
 $back = $bdd->query("SELECT * FROM settings");

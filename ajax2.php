@@ -2,6 +2,22 @@
 session_start();
 include("config.php");
 
+$moderatorManagementActions = ['loadusers', 'adduser', 'deleteuser', 'restoreuser', 'deleteuserpermanently'];
+$isModeratorManagementRequest = isset($_POST['action']) && (
+	in_array($_POST['action'], $moderatorManagementActions, true)
+	|| (in_array($_POST['action'], ['changestate', 'updatebulk'], true) && ($_POST['table'] ?? '') === 'users')
+);
+$sessionRoles = array_filter(array_map('trim', explode(',', (string) ($_SESSION['roles'] ?? ''))));
+$canManageModerators = !empty($_SESSION['id'])
+	&& ($_SESSION['type'] ?? '') === 'moderator'
+	&& (in_array('all', $sessionRoles, true) || in_array('Modérateurs', $sessionRoles, true));
+if ($isModeratorManagementRequest && !$canManageModerators) {
+	http_response_code(403);
+	header('Content-Type: text/plain; charset=utf-8');
+	echo 'Accès interdit';
+	exit;
+}
+
 if(isset($_SESSION['id']) AND isset($_SESSION['fullname'])){
 	if($_SESSION['id'] != "" AND $_SESSION['fullname'] != ""){
 		if(isset($_POST['action'])){
@@ -4278,13 +4294,6 @@ if(isset($_SESSION['id']) AND isset($_SESSION['fullname'])){
 			}
 		}
 	}
-}
-
-function sanitize_vars($var){
-	if(preg_match("#script|select|update|delete|concat|create|table|union|length|show_table|mysql_list_tables|mysql_list_fields|mysql_list_dbs#i",$var)){
-		$var = "";
-	}
-	return htmlspecialchars(addslashes(trim($var)));
 }
 
 function random(){

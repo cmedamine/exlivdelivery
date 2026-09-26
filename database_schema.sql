@@ -178,6 +178,7 @@ CREATE TABLE IF NOT EXISTS `commands` (
   `qty` text NOT NULL,
   `dlm` int(11) DEFAULT 0,
   `subdlm` int(11) DEFAULT 0,
+  `client` int(11) NOT NULL DEFAULT 0,
   `worker` int(11) DEFAULT 0,
   `store` int(11) DEFAULT 0,
   `source` varchar(50) DEFAULT 'Site',
@@ -188,12 +189,21 @@ CREATE TABLE IF NOT EXISTS `commands` (
   `city` varchar(100) NOT NULL,
   `price` decimal(10,2) NOT NULL,
   `fees` decimal(10,2) DEFAULT 0.00,
+  `extrafees` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `package` int(11) NOT NULL DEFAULT 0,
   `phase` varchar(50) DEFAULT 'confirmation',
   `state` varchar(50) DEFAULT 'Nouveau',
   `datereported` int(11) DEFAULT NULL,
   `note` text,
   `workers` text,
+  `collected` enum('on','off') NOT NULL DEFAULT 'off',
   `invoiced` enum('on','off') DEFAULT 'off',
+  `invoiceddlm` enum('on','off') NOT NULL DEFAULT 'off',
+  `confirmed` enum('on','off') NOT NULL DEFAULT 'off',
+  `treated` enum('on','off') NOT NULL DEFAULT 'off',
+  `archived` enum('0','1') NOT NULL DEFAULT '0',
+  `echange` enum('0','1') NOT NULL DEFAULT '0',
+  `openpackage` enum('0','1') NOT NULL DEFAULT '0',
   `clientname` varchar(255) DEFAULT NULL,
   `clientphone` varchar(20) DEFAULT NULL,
   `tracking_code` varchar(50) DEFAULT NULL,
@@ -205,10 +215,13 @@ CREATE TABLE IF NOT EXISTS `commands` (
   KEY `tracking_code` (`tracking_code`),
   KEY `dlm` (`dlm`),
   KEY `subdlm` (`subdlm`),
+  KEY `client` (`client`),
   KEY `worker` (`worker`),
   KEY `store` (`store`),
   KEY `state` (`state`),
   KEY `phase` (`phase`),
+  KEY `collected` (`collected`),
+  KEY `archived` (`archived`),
   KEY `package_type` (`package_type`),
   KEY `trash` (`trash`),
   KEY `dateadd` (`dateadd`),
@@ -226,9 +239,22 @@ CREATE TABLE IF NOT EXISTS `commandshistory` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `command` varchar(50) NOT NULL,
   `state` varchar(50) NOT NULL,
+  `agent` varchar(255) NOT NULL DEFAULT '',
   `dateadd` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `command` (`command`),
+  KEY `dateadd` (`dateadd`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
+-- Table: historylog
+-- Description: Historique des activités
+-- ============================================
+CREATE TABLE IF NOT EXISTS `historylog` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `description` text NOT NULL,
+  `dateadd` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
   KEY `dateadd` (`dateadd`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -242,6 +268,8 @@ CREATE TABLE IF NOT EXISTS `stocks` (
   `title` varchar(255) NOT NULL,
   `ref` varchar(100) NOT NULL,
   `qty` int(11) NOT NULL,
+  `received` enum('on','off') NOT NULL DEFAULT 'off',
+  `dateadd` int(11) NOT NULL DEFAULT 0,
   `trash` enum('0','1') DEFAULT '1',
   PRIMARY KEY (`id`),
   KEY `client` (`client`),
@@ -256,9 +284,12 @@ CREATE TABLE IF NOT EXISTS `stocks` (
 CREATE TABLE IF NOT EXISTS `stockdlms` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `dlm` int(11) NOT NULL,
-  `title` varchar(255) NOT NULL,
-  `ref` varchar(100) NOT NULL,
+  `title` varchar(255) NOT NULL DEFAULT '',
+  `ref` varchar(100) NOT NULL DEFAULT '',
   `qty` int(11) NOT NULL,
+  `stock` int(11) NOT NULL DEFAULT 0,
+  `received` enum('on','off') NOT NULL DEFAULT 'off',
+  `dateadd` int(11) NOT NULL DEFAULT 0,
   `trash` enum('0','1') DEFAULT '1',
   PRIMARY KEY (`id`),
   KEY `dlm` (`dlm`),
@@ -273,9 +304,12 @@ CREATE TABLE IF NOT EXISTS `stockdlms` (
 CREATE TABLE IF NOT EXISTS `shipments` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `client` int(11) NOT NULL,
+  `stock` int(11) NOT NULL DEFAULT 0,
   `title` varchar(255) NOT NULL,
   `ref` varchar(100) NOT NULL,
   `qty` int(11) NOT NULL,
+  `received` enum('on','off') NOT NULL DEFAULT 'off',
+  `dateadd` int(11) NOT NULL DEFAULT 0,
   `trash` enum('0','1') DEFAULT '1',
   PRIMARY KEY (`id`),
   KEY `client` (`client`),
@@ -421,11 +455,16 @@ CREATE TABLE IF NOT EXISTS `spreadsheets` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `client` int(11) DEFAULT NULL,
   `title` varchar(255) NOT NULL,
-  `url` varchar(500) NOT NULL,
-  `dateadd` int(11) NOT NULL,
+  `url` varchar(500) NOT NULL DEFAULT '',
+  `dateadd` int(11) NOT NULL DEFAULT 0,
+  `sheetid` varchar(255) NOT NULL DEFAULT '',
+  `sheetname` varchar(255) NOT NULL DEFAULT '',
+  `lastrow` int(11) NOT NULL DEFAULT 1,
+  `autofetch` enum('on','off') NOT NULL DEFAULT 'off',
   `trash` enum('0','1') DEFAULT '1',
   PRIMARY KEY (`id`),
   KEY `client` (`client`),
+  KEY `autofetch` (`autofetch`),
   KEY `trash` (`trash`),
   FOREIGN KEY (`client`) REFERENCES `users`(`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -436,12 +475,22 @@ CREATE TABLE IF NOT EXISTS `spreadsheets` (
 -- ============================================
 CREATE TABLE IF NOT EXISTS `bls` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `type` enum('BRA','BL','BR','BRL') NOT NULL,
-  `command` varchar(50) NOT NULL,
+  `type` enum('BRA','BL','BR','BRL') NOT NULL DEFAULT 'BL',
+  `command` varchar(50) NOT NULL DEFAULT '',
+  `dlm` int(11) NOT NULL DEFAULT 0,
+  `subdlm` int(11) NOT NULL DEFAULT 0,
+  `client` int(11) NOT NULL DEFAULT 0,
+  `code` varchar(50) NOT NULL DEFAULT '',
+  `cmds` text,
+  `done` enum('on','off') NOT NULL DEFAULT 'off',
   `dateadd` int(11) NOT NULL,
   `trash` enum('0','1') DEFAULT '1',
   PRIMARY KEY (`id`),
   KEY `command` (`command`),
+  KEY `dlm` (`dlm`),
+  KEY `client` (`client`),
+  KEY `code` (`code`),
+  KEY `done` (`done`),
   KEY `type` (`type`),
   KEY `trash` (`trash`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -452,17 +501,45 @@ CREATE TABLE IF NOT EXISTS `bls` (
 -- ============================================
 CREATE TABLE IF NOT EXISTS `factures` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `type` enum('client','dlm') NOT NULL,
-  `target` int(11) NOT NULL,
-  `amount` decimal(10,2) NOT NULL,
+  `type` enum('client','dlm') NOT NULL DEFAULT 'client',
+  `target` int(11) NOT NULL DEFAULT 0,
+  `amount` decimal(10,2) NOT NULL DEFAULT 0.00,
   `status` enum('pending','paid','cancelled') DEFAULT 'pending',
-  `dateadd` int(11) NOT NULL,
+  `dateadd` int(11) NOT NULL DEFAULT 0,
+  `code` varchar(50) NOT NULL DEFAULT '',
+  `dlm` int(11) NOT NULL DEFAULT 0,
+  `client` int(11) NOT NULL DEFAULT 0,
+  `nbcommands` int(11) NOT NULL DEFAULT 0,
+  `price` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `charges` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `note` text,
+  `validated` enum('on','off') NOT NULL DEFAULT 'off',
+  `received` enum('on','off') NOT NULL DEFAULT 'off',
+  `datecreated` int(11) NOT NULL DEFAULT 0,
+  `datereceived` int(11) NOT NULL DEFAULT 0,
   `trash` enum('0','1') DEFAULT '1',
   PRIMARY KEY (`id`),
   KEY `target` (`target`),
+  KEY `code` (`code`),
+  KEY `dlm` (`dlm`),
+  KEY `client` (`client`),
+  KEY `received` (`received`),
   KEY `type` (`type`),
   KEY `trash` (`trash`),
   FOREIGN KEY (`target`) REFERENCES `users`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
+-- Table: facturesdetails
+-- Description: Commandes associées aux factures
+-- ============================================
+CREATE TABLE IF NOT EXISTS `facturesdetails` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `facture` varchar(50) NOT NULL,
+  `command` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `facture` (`facture`),
+  KEY `command` (`command`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================

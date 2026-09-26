@@ -1,6 +1,23 @@
 <?php
 session_start();
 include("config.php");
+
+$moderatorManagementActions = ['loadusers', 'adduser', 'deleteuser', 'restoreuser', 'deleteuserpermanently'];
+$isModeratorManagementRequest = isset($_POST['action']) && (
+	in_array($_POST['action'], $moderatorManagementActions, true)
+	|| (in_array($_POST['action'], ['changestate', 'updatebulk'], true) && ($_POST['table'] ?? '') === 'users')
+);
+$sessionRoles = array_filter(array_map('trim', explode(',', (string) ($_SESSION['roles'] ?? ''))));
+$canManageModerators = !empty($_SESSION['id'])
+	&& ($_SESSION['type'] ?? '') === 'moderator'
+	&& (in_array('all', $sessionRoles, true) || in_array('Modérateurs', $sessionRoles, true));
+if ($isModeratorManagementRequest && !$canManageModerators) {
+	http_response_code(403);
+	header('Content-Type: text/plain; charset=utf-8');
+	echo 'Accès interdit';
+	exit;
+}
+
 include("vendor/autoload.php");
 
 if(isset($_SESSION['id']) AND isset($_SESSION['fullname'])){
@@ -5473,6 +5490,15 @@ if(isset($_SESSION['id']) AND isset($_SESSION['fullname'])){
 			}
 			
 			if($_POST['action'] == "getgooglesheetorders"){
+				$back = $bdd->query("SELECT * FROM spreadsheets WHERE autofetch='on'");
+				if($back->rowCount() == 0){
+					exit;
+				}
+				if(!class_exists('Google_Client') || !class_exists('Google_Service_Sheets')){
+					error_log('Google Sheets auto-fetch skipped: google/apiclient is not installed.');
+					echo 'Google Sheets integration is not installed.';
+					exit;
+				}
 				$client = new \Google_Client();
 				$client->setApplicationName('Google Sheets and PHP');
 				$client->setScopes([\Google_Service_Sheets::SPREADSHEETS]);
@@ -5480,7 +5506,6 @@ if(isset($_SESSION['id']) AND isset($_SESSION['fullname'])){
 				$client->setAuthConfig('eagle.json');
 				$service = new Google_Service_Sheets($client);
 				
-				$back = $bdd->query("SELECT * FROM spreadsheets WHERE autofetch='on'");
 				while($row = $back->fetch()){
 					$spreadsheetId = $row['sheetid'];
 					$range = $row['sheetname']."!A".$row['lastrow'].":Z";
@@ -5514,13 +5539,6 @@ if(isset($_SESSION['id']) AND isset($_SESSION['fullname'])){
 			}
 		}
 	}
-}
-
-function sanitize_vars($var){
-	if(preg_match("#script|select|update|delete|concat|create|table|union|length|show_table|mysql_list_tables|mysql_list_fields|mysql_list_dbs#i",$var)){
-		$var = "";
-	}
-	return htmlspecialchars(addslashes(trim($var)));
 }
 
 function random(){

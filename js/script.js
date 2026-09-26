@@ -15,7 +15,11 @@ $(window).on("load", function() {
 
 // Document Ready event
 $(document).on("ready", function() {
-	getGoogleSheetOrders();
+	// Google Sheet imports belong only to the Google Sheets page. Running this
+	// on every page made an optional integration able to break the dashboard.
+	if($(".lx-table-spreadsheets").length){
+		getGoogleSheetOrders();
+	}
 	getAllNotifs();
 	window.setInterval(function(){
 		getAllNotifs();

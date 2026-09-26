@@ -412,10 +412,6 @@ function loadCityRate(){
 	});	
 }
 
-$(".lx-header-admin > ul > li > img").on("click",function(){
-	$(".lx-account-settings").fadeToggle();
-});
-
 $(".lx-mobile-menu").on("click",function(){
 	$(".lx-main-leftside").css("left","0px");
 });

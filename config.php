@@ -1,20 +1,22 @@
 <?php
 // Charger les variables d'environnement depuis .env si le fichier existe
 $envFile = __DIR__ . '/.env';
+$environment = [];
 if (file_exists($envFile)) {
     $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     foreach ($lines as $line) {
         if (strpos(trim($line), '#') === 0) continue;
         list($name, $value) = explode('=', $line, 2);
+        $environment[trim($name)] = trim($value);
         $_ENV[trim($name)] = trim($value);
     }
 }
 
 try{
-	$dbHost = $_ENV['DB_HOST'] ?? 'localhost';
-	$dbName = $_ENV['DB_NAME'] ?? 'exliv_delivery';
-	$dbUser = $_ENV['DB_USER'] ?? 'exliv_delivery';
-	$dbPass = $_ENV['DB_PASSWORD'] ?? '';
+	$dbHost = $environment['DB_HOST'] ?? $_ENV['DB_HOST'] ?? 'localhost';
+	$dbName = $environment['DB_NAME'] ?? $_ENV['DB_NAME'] ?? 'exliv_delivery';
+	$dbUser = $environment['DB_USER'] ?? $_ENV['DB_USER'] ?? 'exliv_delivery';
+	$dbPass = $environment['DB_PASSWORD'] ?? $_ENV['DB_PASSWORD'] ?? '';
 	
 	$bdd = new PDO('mysql:host='.$dbHost.';dbname='.$dbName.';charset=utf8', $dbUser, $dbPass, array(PDO::ATTR_PERSISTENT => true));
 	$bdd->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -52,7 +54,11 @@ if(isset($_SESSION['type'])){
 	$_SESSION['picture'] = $row['picture'];
 	$_SESSION['phone'] = $row['phone'];
 	$_SESSION['email'] = $row['email'];
-	$_SESSION['roles'] = $row['roles'];
+	// The initial setup account is stored with the special `all` role. Convert
+	// it to the named permissions used by the existing page guards and menu.
+	// Without this, the first administrator can only see the dashboard.
+	$allModeratorRoles = 'Modérateurs,Agents de confirmation,Annonces,Villes,Livreurs,Frais de livraison,Ramassage Agences,Clients,Envois,Stocks,Etats,Emballages,Confirmation,Google Sheets,Ramassage,Commandes,Modification état commandes,BLS,Factures clients,Factures livreurs,Dépences,Réclamations';
+	$_SESSION['roles'] = $row['roles'] === 'all' ? $allModeratorRoles : $row['roles'];
 	$_SESSION['type'] = $row['type'];	
 	
 	if($_SESSION['type'] == "client"){

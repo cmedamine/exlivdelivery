@@ -3,8 +3,8 @@
 	<div class="lx-header-admin">
 		<ul>
 			<li>
-				<img src="uploads/cropped_<?php echo $_SESSION['picture'];?>" />
-				<div class="lx-account-settings">
+				<img src="uploads/cropped_<?php echo $_SESSION['picture'];?>" class="lx-account-menu-toggle" role="button" tabindex="0" aria-label="Ouvrir le menu du compte" aria-expanded="false" />
+				<div class="lx-account-settings" aria-hidden="true">
 					<div>
 						<strong><?php echo $_SESSION['fullname'];?></strong>
 						<p><?php echo $_SESSION['email'];?></p>
@@ -48,5 +48,28 @@ if(isset($_ENV['APP_DEBUG'])){
 			if(typeof console !== 'undefined') console[m] = function(){};
 		});
 	}
+})();
+
+// Keep the account menu available even when the page-wide jQuery script fails.
+(function () {
+	var toggle = document.querySelector('.lx-account-menu-toggle');
+	var menu = document.querySelector('.lx-account-settings');
+	if (!toggle || !menu) return;
+
+	function toggleAccountMenu(event) {
+		if (event) {
+			event.preventDefault();
+			event.stopImmediatePropagation();
+		}
+		var isOpen = menu.style.display === 'block';
+		menu.style.display = isOpen ? 'none' : 'block';
+		menu.setAttribute('aria-hidden', isOpen ? 'true' : 'false');
+		toggle.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
+	}
+
+	toggle.addEventListener('click', toggleAccountMenu);
+	toggle.addEventListener('keydown', function (event) {
+		if (event.key === 'Enter' || event.key === ' ') toggleAccountMenu(event);
+	});
 })();
 </script>

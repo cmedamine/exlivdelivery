@@ -45,10 +45,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 // Insérer le nouvel utilisateur
                 $req = $bdd->prepare("INSERT INTO users(id,fullname,picture,email,password,phone,city,type,roles,active,datesignup,trash) 
-                VALUES ('0',?,?,?,?,?,'client','Clients','on',?,'1')");
+                VALUES ('0',?,'avatar.png',?,?,?,?, 'client','Clients','on',?,'1')");
                 $req->execute([
                     $fullname,
-                    'avatar.png',
                     $email,
                     $hashed_password,
                     $phone,

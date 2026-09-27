@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 // Insérer le nouvel utilisateur
                 $req = $bdd->prepare("INSERT INTO users(id,fullname,picture,email,password,phone,city,type,roles,active,datesignup,trash) 
-                VALUES ('0',?,'avatar.png',?,?,?,?, 'client','Clients','on',?,'1')");
+                VALUES ('0',?,'avatar.png',?,?,?,?, 'client','Clients','off',?,'1')");
                 $req->execute([
                     $fullname,
                     $email,
@@ -56,12 +56,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ]);
                 
                 // Logger l'action
-                add_audit_log($bdd->lastInsertId(), 'create', 'users', null, null, ['email' => $email, 'type' => 'client']);
+                add_audit_log($bdd->lastInsertId(), 'create', 'users', null, null, ['email' => $email, 'type' => 'client', 'active' => 'off']);
                 
-                $success = 'Compte créé avec succès! Vous pouvez maintenant vous connecter.';
+                $success = 'Votre demande d\'inscription a été envoyée. Un administrateur doit approuver votre compte avant votre première connexion.';
                 
-                // Rediriger vers la page de connexion après 2 secondes
-                header('refresh:2;url=login.php');
+                // Rediriger vers la page de connexion après avoir laissé le temps de lire le statut.
+                header('refresh:5;url=login.php');
             }
         } catch (PDOException $e) {
             $error = 'Erreur lors de l\'inscription: ' . $e->getMessage();

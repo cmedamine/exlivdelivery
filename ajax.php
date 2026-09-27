@@ -999,7 +999,7 @@ if(isset($_SESSION['id']) AND isset($_SESSION['fullname'])){
 						<td>RIB <i class="fa fa-sort" data-sort="rib"></i></td>
 						<td>StockOUT <i class="fa fa-sort" data-sort="stockout"></i></td>
 						<td>Date inscription <i class="fa fa-sort" data-sort="datesignup"></i></td>
-						<td>Active <i class="fa fa-sort" data-sort="active"></i></td>
+						<td>Statut <i class="fa fa-sort" data-sort="active"></i></td>
 						<td>Action</td>
 					</tr>
 					<?php
@@ -1041,7 +1041,8 @@ if(isset($_SESSION['id']) AND isset($_SESSION['fullname'])){
 								$class = ' lx-on-off-blue';
 							}
 							?>
-							<div class="lx-on-off<?php echo $class?>" data-state="<?php echo $row['active']?>" data-table="users" data-column="active" data-id="<?php echo $row['id'];?>">
+							<span><?php echo $row['active'] === 'on' ? 'Approuvé' : 'En attente'; ?></span>
+							<div class="lx-on-off<?php echo $class?>" title="<?php echo $row['active'] === 'on' ? 'Retirer l\'approbation' : 'Approuver ce client'; ?>" data-state="<?php echo $row['active']?>" data-table="clients" data-column="active" data-id="<?php echo $row['id'];?>">
 								<div class="lx-on-off-fill">
 									<i class="material-icons">check</i>
 									<span></span>
@@ -5295,6 +5296,36 @@ if(isset($_SESSION['id']) AND isset($_SESSION['fullname'])){
 			}
 
 			if($_POST['action'] == "changestate"){
+				if($_POST['table'] == "clients"){
+					if(($_POST['column'] ?? '') !== 'active' || !in_array($_POST['state'] ?? '', ['on', 'off'], true)){
+						http_response_code(422);
+						echo 'Statut client invalide';
+						exit;
+					}
+
+					$clientId = filter_var($_POST['id'] ?? null, FILTER_VALIDATE_INT);
+					if(!$clientId){
+						http_response_code(422);
+						echo 'Client invalide';
+						exit;
+					}
+
+					$account = $bdd->prepare("SELECT active FROM users WHERE id = ? AND type = 'client' AND trash = '1'");
+					$account->execute([$clientId]);
+					$client = $account->fetch(PDO::FETCH_ASSOC);
+					if(!$client){
+						http_response_code(404);
+						echo 'Client introuvable';
+						exit;
+					}
+
+					$update = $bdd->prepare("UPDATE users SET active = ? WHERE id = ? AND type = 'client' AND trash = '1'");
+					$update->execute([$_POST['state'], $clientId]);
+					add_audit_log($_SESSION['id'], 'update', 'users', $clientId, ['active' => $client['active']], ['active' => $_POST['state']]);
+					echo 'OK';
+					exit;
+				}
+
 				if($_POST['table'] == "shipments"){
 					$back = $bdd->query("SELECT client,stock,title,ref,qty,received FROM shipments WHERE id='".$_POST['id']."'");
 					$row = $back->fetch();

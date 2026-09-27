@@ -60,9 +60,9 @@ if(isset($_SESSION['id']) AND isset($_SESSION['fullname'])){
 								<label><a href="javascript:;" class="lx-search-keyword"><i class="fa fa-search"></i></a><input type="text" name="keyword" id="keyword" placeholder="Mot clé" data-table="clients" /></label>
 								<label>
 									<select name="active" id="active">
-										<option value="">Tous les statut</option>
-										<option value="on">Active</option>
-										<option value="off">Non Active</option>
+									<option value="">Tous les statuts</option>
+									<option value="on">Approuvés</option>
+									<option value="off">En attente d'approbation</option>
 									</select>
 								</label>
 								<input type="hidden" name="sortby" value="" />

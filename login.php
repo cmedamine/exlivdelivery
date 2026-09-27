@@ -13,8 +13,10 @@ if (isset($_POST['username'], $_POST['password'])) {
 	$validPassword = $row && (password_verify($password, $row['password']) || hash_equals((string) $row['password'], $password));
 	if (!$validPassword) {
 		$error = 'E-mail ou mot de passe est incorrect';
-	} elseif ($row['active'] !== 'on' || $row['trash'] !== '1') {
-		$error = 'Votre compte n\'est pas actif';
+	} elseif ($row['trash'] !== '1') {
+		$error = 'Votre compte n\'est pas disponible';
+	} elseif ($row['active'] !== 'on') {
+		$error = 'Votre compte est en attente d\'approbation par un administrateur.';
 	} else {
 		if (!password_verify($password, $row['password'])) {
 			$upgrade = $bdd->prepare('UPDATE users SET password = ? WHERE id = ?');

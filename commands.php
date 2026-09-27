@@ -8,8 +8,10 @@ if(!isset($_SESSION['id'])){
 	header('location: login.php');
 }
 else{
-	if(!preg_match("#Commandes#",$_SESSION['roles']) AND $_SESSION['type'] == "moderator"){	
-		header('location: 404.php');
+	if(!in_array($_SESSION['type'], ["client", "dlm", "subdlm", "worker", "moderator"], true)
+		OR ($_SESSION['type'] == "moderator" AND !preg_match("#Commandes#",$_SESSION['roles']))){
+	header('location: 404.php');
+	exit;
 	}
 }
 
@@ -200,7 +202,9 @@ if(isset($_SESSION['id']) AND isset($_SESSION['fullname'])){
 										<input type="text" name="searchadvanced" style="margin-bottom:20px;" />
 										<ul>
 											<?php
-											$back = $bdd->query("SELECT DISTINCT city FROM shippingfees WHERE trash='1' ORDER BY city");
+											// The global city filter must use the configured city list.  Shipping
+											// fees are assigned later and can legitimately be empty.
+											$back = $bdd->query("SELECT city FROM cities WHERE trash='1' ORDER BY city");
 											if($_SESSION['type'] == "dlm"){
 												$back = $bdd->query("SELECT DISTINCT city FROM shippingfees WHERE trash='1' AND dlm='".$_SESSION['id']."' ORDER BY city");
 											}
@@ -254,7 +258,9 @@ if(isset($_SESSION['id']) AND isset($_SESSION['fullname'])){
 													$extrareq .= " AND (state IN('Annulé','Refusé','Retourné','Retourné vers agence','Retour client reçu','Demande de retour','Demande de retour par administration','Hors zone','Manque de stock','Retour reçu agence casablanca') OR state LIKE '%Retour%')";
 												}
 											}
-											$back = $bdd->query("SELECT state FROM trackingstates WHERE phase LIKE '%Livraison%' AND trash='1'".$extrareq." ORDER BY state");
+											// A command may be cancelled, returned, confirmed, or in delivery;
+											// do not hide valid active states by restricting this filter to one phase.
+											$back = $bdd->query("SELECT state FROM trackingstates WHERE trash='1'".$extrareq." ORDER BY state");
 											while($row = $back->fetch()){
 												?>
 											<li><label><input type="checkbox" value="<?php echo $row['state'];?>" <?php if(isset($_GET['s'])){if(preg_match("#".str_replace(",","|",$_GET['s'])."#",$row['state'])){echo "checked";}}?> /> <?php echo $row['state'];?><del class="checkmark"></del></label></li>
@@ -601,10 +607,16 @@ if(isset($_SESSION['id']) AND isset($_SESSION['fullname'])){
 											if($_SESSION['type'] == "dlm"){
 												$agent = "Livreur";
 											}
-											if($_SESSION['type'] == "client" OR $_SESSION['type'] == "worker"){
+											if($_SESSION['type'] == "client"){
 												$agent = "Client";
 											}
-											$back = $bdd->query("SELECT state,color FROM trackingstates WHERE agent LIKE '%".$agent."%' AND phase LIKE '%Livraison%' AND trash='1' ORDER BY state");	
+											if($_SESSION['type'] == "worker"){
+												$agent = "Agent de confirmation";
+											}
+											// State permissions are configured per role in trackingstates.  Do not
+											// restrict the editor to the delivery phase: clients also need their
+											// confirmation/cancellation states and delivery staff need pickup states.
+											$back = $bdd->query("SELECT state,color FROM trackingstates WHERE agent LIKE '%".$agent."%' AND trash='1' ORDER BY state");
 											while($row = $back->fetch()){
 												?>
 											<a href="javascript:;" class="lx-coli-state-delivarymen" data-state="<?php echo $row['state'];?>" style="font-weight:500;background:<?php echo $row['color'];?>;color:#FFFFFF;"><?php echo $row['state'];?></a>

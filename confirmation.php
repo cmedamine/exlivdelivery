@@ -10,8 +10,10 @@ if(!isset($_SESSION['id'])){
 	header('location: login.php');
 }
 else{
-	if(!preg_match("#Confirmation#",$_SESSION['roles']) AND $_SESSION['type'] == "moderator"){	
+	if(($_SESSION['type'] == "moderator" AND !preg_match("#Confirmation#",$_SESSION['roles']))
+		OR ($_SESSION['type'] != "moderator" AND $_SESSION['type'] != "worker")){
 		header('location: 404.php');
+		exit;
 	}
 }
 
@@ -482,7 +484,8 @@ if(isset($_SESSION['id']) AND isset($_SESSION['fullname'])){
 									<form action="#" method="post" id="editstateform">
 										<div class="lx-textfield lx-g1 lx-pb-0">
 											<?php
-											$back = $bdd->query("SELECT state,color FROM trackingstates WHERE phase LIKE '%Confirmation%' AND trash='1' ORDER BY state");	
+											$confirmationAgent = $_SESSION['type'] == 'worker' ? 'Agent de confirmation' : 'Modérateur';
+											$back = $bdd->query("SELECT state,color FROM trackingstates WHERE phase LIKE '%Confirmation%' AND agent LIKE '%".$confirmationAgent."%' AND trash='1' ORDER BY state");
 											while($row = $back->fetch()){
 												?>
 											<a href="javascript:;" class="lx-coli-state-delivarymen" data-state="<?php echo $row['state'];?>" style="font-weight:500;background:<?php echo $row['color'];?>;color:#FFFFFF;"><?php echo $row['state'];?></a>

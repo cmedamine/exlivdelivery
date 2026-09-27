@@ -6,23 +6,19 @@ if(!isset($_SESSION['id'])){
 	header('location: login.php');
 }
 else{
-	if(isset($_GET['type'])){
-		if($_GET['type'] == "dlm"){
-			if((!preg_match("#Factures livreurs#",$_SESSION['roles']) AND $_SESSION['type'] == "moderator") OR $_SESSION['type'] == "client"){	
-				header('location: 404.php');
-			}				
-		}
-		elseif($_GET['type'] == "client"){
-			if((!preg_match("#Factures client#",$_SESSION['roles']) AND $_SESSION['type'] == "moderator") OR $_SESSION['type'] == "dlm"){	
-				header('location: 404.php');
-			}				
-		}
-		else{
-			header('location: 404.php');
-		}
+	$type = $_GET['type'] ?? '';
+	$canView = false;
+	if ($type == 'dlm') {
+		$canView = $_SESSION['type'] == 'dlm'
+			|| ($_SESSION['type'] == 'moderator' && preg_match("#Factures livreurs#", $_SESSION['roles']));
 	}
-	else{
+	elseif ($type == 'client') {
+		$canView = $_SESSION['type'] == 'client'
+			|| ($_SESSION['type'] == 'moderator' && preg_match("#Factures client#", $_SESSION['roles']));
+	}
+	if (!$canView) {
 		header('location: 404.php');
+		exit;
 	}
 }
 

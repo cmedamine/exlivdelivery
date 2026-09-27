@@ -152,6 +152,53 @@ try {
         echo "Added column: commandshistory.agent\n";
     }
 
+    $trackingColumns = $bdd->query('SHOW COLUMNS FROM `trackingstates`')->fetchAll(PDO::FETCH_COLUMN);
+    $trackingDefinitions = [
+        'color' => "VARCHAR(20) NOT NULL DEFAULT '#757575'",
+        'agent' => 'TEXT',
+        'kpi' => "VARCHAR(50) NOT NULL DEFAULT ''",
+    ];
+    foreach ($trackingDefinitions as $name => $definition) {
+        if (!in_array($name, $trackingColumns, true)) {
+            $bdd->exec("ALTER TABLE `trackingstates` ADD COLUMN `{$name}` {$definition}");
+            echo "Added column: trackingstates.{$name}\n";
+        }
+    }
+
+    $stateConfiguration = [
+        ['Nouveau', '#2196F3', 'En cours', 'Modérateur'],
+        ['Confirmé', '#03A9F4', 'En cours', 'Modérateur,Agent de confirmation'],
+        ['Reporté', '#FF9800', 'En cours', 'Modérateur,Client,Agent de confirmation'],
+        ['Interessé', '#9C27B0', 'En cours', 'Modérateur,Agent de confirmation'],
+        ['Changement adresse', '#FF9800', 'En cours', 'Modérateur,Client,Agent de confirmation'],
+        ['Annulé', '#F44336', 'Echouées', 'Modérateur,Client,Agent de confirmation,Livreur'],
+        ['Refusé', '#F44336', 'Echouées', 'Modérateur,Agent de confirmation,Livreur'],
+        ['Hors zone', '#F44336', 'Echouées', 'Modérateur,Agent de confirmation,Livreur'],
+        ['Ramassé', '#00BCD4', 'En cours', 'Modérateur,Livreur'],
+        ['En cours de livraison', '#2196F3', 'En cours', 'Modérateur,Livreur'],
+        ['Livré', '#4CAF50', 'Livrées', 'Modérateur,Livreur'],
+        ['Retour', '#795548', 'Echouées', 'Modérateur,Livreur'],
+        ['Echec de livraison', '#F44336', 'Echouées', 'Modérateur,Livreur'],
+    ];
+    $configureState = $bdd->prepare("UPDATE `trackingstates` SET `color` = ?, `kpi` = ?, `agent` = ? WHERE `state` = ?");
+    foreach ($stateConfiguration as [$state, $color, $kpi, $agent]) {
+        $configureState->execute([$color, $kpi, $agent, $state]);
+    }
+
+    $bdd->exec("ALTER TABLE `smsmodels` MODIFY COLUMN `title` VARCHAR(255) NOT NULL DEFAULT '', MODIFY COLUMN `content` TEXT NULL");
+    $smsModelColumns = $bdd->query('SHOW COLUMNS FROM `smsmodels`')->fetchAll(PDO::FETCH_COLUMN);
+    $smsModelDefinitions = [
+        'state' => "VARCHAR(255) NOT NULL DEFAULT ''",
+        'message' => 'TEXT',
+        'active' => "ENUM('on','off') NOT NULL DEFAULT 'on'",
+    ];
+    foreach ($smsModelDefinitions as $name => $definition) {
+        if (!in_array($name, $smsModelColumns, true)) {
+            $bdd->exec("ALTER TABLE `smsmodels` ADD COLUMN `{$name}` {$definition}");
+            echo "Added column: smsmodels.{$name}\n";
+        }
+    }
+
     echo "Legacy workflow schema migration complete.\n";
 } catch (PDOException $exception) {
     fwrite(STDERR, 'Migration failed: ' . $exception->getMessage() . PHP_EOL);

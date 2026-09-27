@@ -144,28 +144,32 @@ CREATE TABLE IF NOT EXISTS `gshippingfees` (
 CREATE TABLE IF NOT EXISTS `trackingstates` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `state` varchar(100) NOT NULL,
+  `color` varchar(20) NOT NULL DEFAULT '#757575',
+  `agent` text,
   `phase` varchar(100) NOT NULL,
+  `kpi` varchar(50) NOT NULL DEFAULT '',
   `trash` enum('0','1') DEFAULT '1',
   PRIMARY KEY (`id`),
   KEY `phase` (`phase`),
+  KEY `kpi` (`kpi`),
   KEY `trash` (`trash`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Insert default tracking states
-INSERT INTO `trackingstates` (`state`, `phase`, `trash`) VALUES
-('Nouveau', 'Confirmation', '1'),
-('Confirmé', 'Confirmation', '1'),
-('Reporté', 'Confirmation', '1'),
-('Interessé', 'Confirmation', '1'),
-('Changement adresse', 'Confirmation', '1'),
-('Annulé', 'Confirmation', '1'),
-('Refusé', 'Confirmation', '1'),
-('Hors zone', 'Confirmation', '1'),
-('Ramassé', 'Ramassage', '1'),
-('En cours de livraison', 'Livraison', '1'),
-('Livré', 'Livraison', '1'),
-('Retour', 'Retour', '1'),
-('Echec de livraison', 'Livraison', '1');
+INSERT INTO `trackingstates` (`state`, `color`, `agent`, `phase`, `kpi`, `trash`) VALUES
+('Nouveau', '#2196F3', 'Modérateur', 'Confirmation', 'En cours', '1'),
+('Confirmé', '#03A9F4', 'Modérateur,Agent de confirmation', 'Confirmation', 'En cours', '1'),
+('Reporté', '#FF9800', 'Modérateur,Client,Agent de confirmation', 'Confirmation', 'En cours', '1'),
+('Interessé', '#9C27B0', 'Modérateur,Agent de confirmation', 'Confirmation', 'En cours', '1'),
+('Changement adresse', '#FF9800', 'Modérateur,Client,Agent de confirmation', 'Confirmation', 'En cours', '1'),
+('Annulé', '#F44336', 'Modérateur,Client,Agent de confirmation,Livreur', 'Confirmation', 'Echouées', '1'),
+('Refusé', '#F44336', 'Modérateur,Agent de confirmation,Livreur', 'Confirmation', 'Echouées', '1'),
+('Hors zone', '#F44336', 'Modérateur,Agent de confirmation,Livreur', 'Confirmation', 'Echouées', '1'),
+('Ramassé', '#00BCD4', 'Modérateur,Livreur', 'Ramassage', 'En cours', '1'),
+('En cours de livraison', '#2196F3', 'Modérateur,Livreur', 'Livraison', 'En cours', '1'),
+('Livré', '#4CAF50', 'Modérateur,Livreur', 'Livraison', 'Livrées', '1'),
+('Retour', '#795548', 'Modérateur,Livreur', 'Retour', 'Echouées', '1'),
+('Echec de livraison', '#F44336', 'Modérateur,Livreur', 'Livraison', 'Echouées', '1');
 
 -- ============================================
 -- Table: commands
@@ -422,10 +426,14 @@ CREATE TABLE IF NOT EXISTS `smsdevices` (
 -- ============================================
 CREATE TABLE IF NOT EXISTS `smsmodels` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `title` varchar(255) NOT NULL,
-  `content` text NOT NULL,
+  `title` varchar(255) NOT NULL DEFAULT '',
+  `content` text,
+  `state` varchar(255) NOT NULL DEFAULT '',
+  `message` text,
+  `active` enum('on','off') NOT NULL DEFAULT 'on',
   `trash` enum('0','1') DEFAULT '1',
   PRIMARY KEY (`id`),
+  KEY `active` (`active`),
   KEY `trash` (`trash`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

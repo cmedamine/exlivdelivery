@@ -18,7 +18,7 @@
 		?>
 	<ul>
 	<ul>
-		<li <?php echo ($_SESSION['type']!="worker" AND $_SESSION['type']!="subdlm")?'':'style="display:none;"';?>><a href="index.php" class="<?php if(basename($_SERVER['PHP_SELF']) == "index.php"){echo 'active';}?>"><i class="fa fa-chart-bar"></i>Statistiques</a></li>
+		<li <?php echo ($_SESSION['type'] == "moderator")?'':'style="display:none;"';?>><a href="index.php" class="<?php if(basename($_SERVER['PHP_SELF']) == "index.php"){echo 'active';}?>"><i class="fa fa-chart-bar"></i>Statistiques</a></li>
 		<?php
 		if($_SESSION['type'] == "moderator"){
 			?>
@@ -126,15 +126,6 @@
 			<ul style="<?php echo preg_match("#^(shipments.php|stocks.php)$#",basename($_SERVER['PHP_SELF']))?'display:block;':'';?>">
 				<li><a href="shipments.php" class="<?php if(basename($_SERVER['PHP_SELF']) == "shipments.php"){echo 'active';}?>">Envois <span class="lx-shipments-notif"></span></a></li>
 				<li><a href="stocks.php" class="<?php if(basename($_SERVER['PHP_SELF']) == "stocks.php"){echo 'active';}?>">Stocks clients</a></li>
-			</ul>
-		</li>
-		<li>
-			<a href="javascript:;" class="<?php echo preg_match("#^(confirmation.php|spreadsheets.php|integrations.php)$#",basename($_SERVER['PHP_SELF']))?'active':'';?>"><i class="fa fa-headset"></i>Call Center</a>
-			<i class="fa fa-angle-down"></i>
-			<ul style="<?php echo preg_match("#^(confirmation.php|spreadsheets.php|integrations.php)$#",basename($_SERVER['PHP_SELF']))?'display:block;':'';?>">
-				<li><a href="confirmation.php" class="<?php if(basename($_SERVER['PHP_SELF']) == "confirmation.php"){echo 'active';}?>">Confirmation <span class="lx-confirmation-notif"></span></a></li>
-				<li><a href="spreadsheets.php" class="<?php if(basename($_SERVER['PHP_SELF']) == "spreadsheets.php"){echo 'active';}?>">Google Sheets</a></li>
-				<li><a href="integrations.php" class="<?php if(basename($_SERVER['PHP_SELF']) == "integrations.php"){echo 'active';}?>">Intégrations E-commerce</a></li>
 			</ul>
 		</li>
 		<li>

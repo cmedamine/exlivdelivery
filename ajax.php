@@ -18,6 +18,21 @@ if ($isModeratorManagementRequest && !$canManageModerators) {
 	exit;
 }
 
+$clientManagementActions = ['loadclients', 'addclient', 'deleteclient', 'restoreclient', 'deleteclientpermanently'];
+$isClientManagementRequest = isset($_POST['action']) && (
+	in_array($_POST['action'], $clientManagementActions, true)
+	|| (in_array($_POST['action'], ['changestate', 'updatebulk'], true) && ($_POST['table'] ?? '') === 'clients')
+);
+$canManageClients = !empty($_SESSION['id'])
+	&& ($_SESSION['type'] ?? '') === 'moderator'
+	&& (in_array('all', $sessionRoles, true) || in_array('Clients', $sessionRoles, true));
+if ($isClientManagementRequest && !$canManageClients) {
+	http_response_code(403);
+	header('Content-Type: text/plain; charset=utf-8');
+	echo 'Accès interdit';
+	exit;
+}
+
 include("vendor/autoload.php");
 
 if(isset($_SESSION['id']) AND isset($_SESSION['fullname'])){
@@ -915,18 +930,35 @@ if(isset($_SESSION['id']) AND isset($_SESSION['fullname'])){
 				$back = $bdd->query("SELECT id FROM users WHERE email='".$_POST['email']."'");
 				if($back->rowCount() == 0){				
 					if($_POST['id'] == "0"){
-						$req = $bdd->prepare("INSERT INTO users(id,fullname,picture,email,password,phone,sav,city,cin,store,bank,rib,stockout,type,roles,active,datesignup,trash) VALUES ('0','".sanitize_vars($_POST['fullname'])."','avatar.png','".sanitize_vars($_POST['email'])."','".sanitize_vars($_POST['password'])."','".sanitize_vars($_POST['phone'])."','".sanitize_vars($_POST['sav'])."','".sanitize_vars($_POST['city'])."','".sanitize_vars($_POST['cin'])."','".sanitize_vars($_POST['store'])."','".sanitize_vars($_POST['bank'])."','".sanitize_vars($_POST['rib'])."','".sanitize_vars($_POST['stockout'])."','client','','on','".time()."','1')");
+						if (strlen((string) $_POST['password']) < 6) {
+							http_response_code(422);
+							echo "Mot de passe invalide";
+							exit;
+						}
+						$req = $bdd->prepare("INSERT INTO users(id,fullname,picture,email,password,phone,sav,city,cin,store,bank,rib,stockout,type,roles,active,datesignup,trash) VALUES ('0','".sanitize_vars($_POST['fullname'])."','avatar.png','".sanitize_vars($_POST['email'])."','".hash_password((string) $_POST['password'])."','".sanitize_vars($_POST['phone'])."','".sanitize_vars($_POST['sav'])."','".sanitize_vars($_POST['city'])."','".sanitize_vars($_POST['cin'])."','".sanitize_vars($_POST['store'])."','".sanitize_vars($_POST['bank'])."','".sanitize_vars($_POST['rib'])."','".sanitize_vars($_POST['stockout'])."','client','','on','".time()."','1')");
 						$req->execute();
 					}
 					else{
-						$req = $bdd->prepare("UPDATE users SET fullname='".sanitize_vars($_POST['fullname'])."',email='".sanitize_vars($_POST['email'])."',password='".sanitize_vars($_POST['password'])."',phone='".sanitize_vars($_POST['phone'])."',sav='".sanitize_vars($_POST['sav'])."',city='".sanitize_vars($_POST['city'])."',cin='".sanitize_vars($_POST['cin'])."',store='".sanitize_vars($_POST['store'])."',bank='".sanitize_vars($_POST['bank'])."',rib='".sanitize_vars($_POST['rib'])."',stockout='".sanitize_vars($_POST['stockout'])."' WHERE id='".$_POST['id']."'");
+						if ($_POST['password'] !== '' && strlen((string) $_POST['password']) < 6) {
+							http_response_code(422);
+							echo "Mot de passe invalide";
+							exit;
+						}
+						$passwordUpdate = $_POST['password'] !== '' ? ",password='".hash_password((string) $_POST['password'])."'" : '';
+						$req = $bdd->prepare("UPDATE users SET fullname='".sanitize_vars($_POST['fullname'])."',email='".sanitize_vars($_POST['email'])."'".$passwordUpdate.",phone='".sanitize_vars($_POST['phone'])."',sav='".sanitize_vars($_POST['sav'])."',city='".sanitize_vars($_POST['city'])."',cin='".sanitize_vars($_POST['cin'])."',store='".sanitize_vars($_POST['store'])."',bank='".sanitize_vars($_POST['bank'])."',rib='".sanitize_vars($_POST['rib'])."',stockout='".sanitize_vars($_POST['stockout'])."' WHERE id='".$_POST['id']."'");
 						$req->execute();
 					}
 				}
 				else{
 					$back = $bdd->query("SELECT id FROM users WHERE email='".$_POST['email']."' AND id='".$_POST['id']."'");
 					if($back->rowCount() != 0){
-						$req = $bdd->prepare("UPDATE users SET fullname='".sanitize_vars($_POST['fullname'])."',email='".sanitize_vars($_POST['email'])."',password='".sanitize_vars($_POST['password'])."',phone='".sanitize_vars($_POST['phone'])."',sav='".sanitize_vars($_POST['sav'])."',city='".sanitize_vars($_POST['city'])."',cin='".sanitize_vars($_POST['cin'])."',store='".sanitize_vars($_POST['store'])."',bank='".sanitize_vars($_POST['bank'])."',rib='".sanitize_vars($_POST['rib'])."',stockout='".sanitize_vars($_POST['stockout'])."' WHERE id='".$_POST['id']."'");
+						if ($_POST['password'] !== '' && strlen((string) $_POST['password']) < 6) {
+							http_response_code(422);
+							echo "Mot de passe invalide";
+							exit;
+						}
+						$passwordUpdate = $_POST['password'] !== '' ? ",password='".hash_password((string) $_POST['password'])."'" : '';
+						$req = $bdd->prepare("UPDATE users SET fullname='".sanitize_vars($_POST['fullname'])."',email='".sanitize_vars($_POST['email'])."'".$passwordUpdate.",phone='".sanitize_vars($_POST['phone'])."',sav='".sanitize_vars($_POST['sav'])."',city='".sanitize_vars($_POST['city'])."',cin='".sanitize_vars($_POST['cin'])."',store='".sanitize_vars($_POST['store'])."',bank='".sanitize_vars($_POST['bank'])."',rib='".sanitize_vars($_POST['rib'])."',stockout='".sanitize_vars($_POST['stockout'])."' WHERE id='".$_POST['id']."'");
 						$req->execute();						
 					}
 					else{
@@ -1024,7 +1056,6 @@ if(isset($_SESSION['id']) AND isset($_SESSION['fullname'])){
 								data-id="<?php echo $row['id'];?>"
 								data-fullname="<?php echo $row['fullname'];?>"
 								data-email="<?php echo $row['email'];?>"
-								data-password="<?php echo $row['password'];?>"
 								data-phone="<?php echo $row['phone'];?>"
 								data-sav="<?php echo $row['sav'];?>"
 								data-city="<?php echo $row['city'];?>"
@@ -2620,12 +2651,48 @@ if(isset($_SESSION['id']) AND isset($_SESSION['fullname'])){
 			}
 
 			if($_POST['action'] == "editstate"){
+				$commandRequest = $bdd->prepare("SELECT * FROM commands WHERE id = ?");
+				$commandRequest->execute([$_POST['id']]);
+				$command = $commandRequest->fetch();
+				if (!$command) {
+					http_response_code(404);
+					echo 'Commande introuvable';
+					exit;
+				}
+
+				$stateAgent = 'Modérateur';
+				if ($_SESSION['type'] == 'client') {
+					$stateAgent = 'Client';
+					if ((string) $command['client'] !== (string) $_SESSION['id']) {
+						http_response_code(403);
+						echo 'Accès interdit';
+						exit;
+					}
+				}
+				elseif ($_SESSION['type'] == 'worker') {
+					$stateAgent = 'Agent de confirmation';
+					if ((string) $command['worker'] !== (string) $_SESSION['id']) {
+						http_response_code(403);
+						echo 'Accès interdit';
+						exit;
+					}
+				}
+				elseif ($_SESSION['type'] == 'dlm' || $_SESSION['type'] == 'subdlm') {
+					$stateAgent = 'Livreur';
+				}
+
+				$allowedStateRequest = $bdd->prepare("SELECT id FROM trackingstates WHERE state = ? AND trash = '1' AND agent LIKE ?");
+				$allowedStateRequest->execute([$_POST['state'], '%' . $stateAgent . '%']);
+				if (!$allowedStateRequest->fetch()) {
+					http_response_code(403);
+					echo 'Cet état n’est pas autorisé pour votre compte';
+					exit;
+				}
+
 				if($_SESSION['type'] == "dlm" AND $_SESSION['roles'] == "Affichage commun"){
 					$req = $bdd->prepare("UPDATE commands SET dlm='".sanitize_vars($_SESSION['id'])."' WHERE id='".$_POST['id']."'");
 					$req->execute();
 				}
-				$back = $bdd->query("SELECT * FROM commands WHERE id='".$_POST['id']."'");
-				$command = $back->fetch();
 				$req = "";
 				if($_POST['state'] == "Ajouté"){
 					$req = ",collected='off'";
@@ -2647,8 +2714,20 @@ if(isset($_SESSION['id']) AND isset($_SESSION['fullname'])){
 					$confirmationfees = $settings['confirmationfees'];
 				}
 					
-				$req = $bdd->prepare("UPDATE commands SET treated='off',state='".sanitize_vars($_POST['state'])."'".$req.",datereported='".sanitize_vars(strtotime(str_replace("/","-",$_POST['datereported'])))."',note=CONCAT(note,'".$note."'),dateupdate='".time()."' WHERE id='".$_POST['id']."'");
-				$req->execute();
+				// A report date is optional.  Sending an empty string to an integer
+				// column causes MariaDB (in strict mode) to reject the whole update.
+				$reportedAt = null;
+				if ($_POST['datereported'] !== '') {
+					$reportedAt = strtotime(str_replace("/", "-", $_POST['datereported']));
+				}
+				$req = $bdd->prepare("UPDATE commands SET treated='off', state=:state".$req.", datereported=:datereported, note=CONCAT(note,:note), dateupdate=:dateupdate WHERE id=:id");
+				$req->execute([
+					':state' => sanitize_vars($_POST['state']),
+					':datereported' => $reportedAt,
+					':note' => $note,
+					':dateupdate' => time(),
+					':id' => $_POST['id'],
+				]);
 				$req = $bdd->prepare("INSERT INTO commandshistory(id,command,state,agent,dateadd) VALUES ('0','".$command['code']."','".sanitize_vars($_POST['state'])."','".$_SESSION['fullname']."','".time()."')");
 				$req->execute();
 				if($_POST['state'] == "Livré" AND $command['state'] != "Livré"){
@@ -2929,7 +3008,10 @@ if(isset($_SESSION['id']) AND isset($_SESSION['fullname'])){
 						<td>Action</td>				
 					</tr>
 					<?php
-					$req = "SELECT * FROM commands c WHERE trash='".$_POST['state']."' AND state NOT IN('Ajouté') AND collected='on'".$extrareq;
+					// Client-created packages begin as `Nouveau` and are not collected
+					// yet. Clients must still be able to see their own submissions.
+					$collectedFilter = $_SESSION['type'] === 'client' ? '' : " AND collected='on'";
+					$req = "SELECT * FROM commands c WHERE trash='".$_POST['state']."' AND state NOT IN('Ajouté')".$collectedFilter.$extrareq;
 					if($_POST['archived'] == "1"){
 						$req = "SELECT * FROM commandsarchive c WHERE trash='".$_POST['state']."' AND state NOT IN('Ajouté') AND collected='on'".$extrareq;
 					}

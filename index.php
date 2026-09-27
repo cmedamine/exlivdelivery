@@ -10,10 +10,12 @@ include("config.php");
 
 if(!isset($_SESSION['id'])){
 	header('location: login.php');
+	exit;
 }
 else{
 	if($_SESSION['type'] != "moderator"){
-		//header('location: commands.php');
+		header('location: commands.php');
+		exit;
 	}	
 }
 

@@ -19,6 +19,8 @@ if($_SESSION['type'] != "client"){
 
 $error = '';
 $success = '';
+$fromStock = false;
+$stockId = '';
 
 // Traitement du formulaire d'ajout
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -31,16 +33,64 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $qty = sanitize_vars($_POST['qty'] ?? '1');
     $price = sanitize_vars($_POST['price'] ?? '0');
     $note = sanitize_vars($_POST['note'] ?? '');
+    $fromStock = ($_POST['from_stock'] ?? '') === '1';
+    $stockId = (string) ($_POST['stock_id'] ?? '');
     
     // Validation
-    if (empty($fullname) || empty($phone) || empty($address) || empty($city) || empty($product)) {
+    if (empty($fullname) || empty($phone) || empty($address) || empty($city) || (!$fromStock && empty($product))) {
         $error = 'Veuillez remplir tous les champs obligatoires.';
     } elseif (!validate_phone($phone)) {
         $error = 'Numéro de téléphone invalide.';
-    } elseif (!is_numeric($price)) {
-        $error = 'Le prix doit être un nombre.';
+    } elseif (!is_numeric($price) || !ctype_digit((string) $qty) || (int) $qty < 1) {
+        $error = 'Le prix et la quantité doivent être des nombres valides.';
+    } elseif ($fromStock && !ctype_digit($stockId)) {
+        $error = 'Choisissez un produit de votre stock.';
     } else {
         try {
+            if ($fromStock) {
+                // Commands linked to stock store its numeric stock ID in `product`.
+                // Lock the selected row while checking availability to avoid overselling.
+                $bdd->beginTransaction();
+                $stockRequest = $bdd->prepare(
+                    "SELECT id, qty FROM stocks WHERE id = ? AND client = ? AND received = 'on' AND trash = '1' FOR UPDATE"
+                );
+                $stockRequest->execute([(int) $stockId, $_SESSION['id']]);
+                $stock = $stockRequest->fetch();
+                if (!$stock) {
+                    throw new RuntimeException('Ce produit de stock est introuvable ou n’est pas encore validé.');
+                }
+
+                $usedRequest = $bdd->prepare(
+                    "SELECT product, qty FROM commands
+                     WHERE client = ? AND trash = '1' AND code NOT LIKE 'CHANGE-%'
+                     AND state NOT IN ('Ajouté', 'Retour client reçu')
+                     AND (product = ? OR product LIKE ? OR product LIKE ? OR product LIKE ?)"
+                );
+                $stockProduct = (string) $stock['id'];
+                $usedRequest->execute([
+                    $_SESSION['id'],
+                    $stockProduct,
+                    $stockProduct . ',%',
+                    '%,' . $stockProduct . ',%',
+                    '%,' . $stockProduct,
+                ]);
+                $usedQuantity = 0;
+                while ($usedCommand = $usedRequest->fetch()) {
+                    $products = explode(',', (string) $usedCommand['product']);
+                    $quantities = explode(',', (string) $usedCommand['qty']);
+                    foreach ($products as $index => $commandProduct) {
+                        if ($commandProduct === $stockProduct) {
+                            $usedQuantity += (int) ($quantities[$index] ?? 0);
+                        }
+                    }
+                }
+
+                if ((int) $qty > ((int) $stock['qty'] - $usedQuantity)) {
+                    throw new RuntimeException('La quantité demandée dépasse le stock disponible.');
+                }
+                $product = $stockProduct;
+            }
+
             // Générer le code de commande
             $back = $bdd->query("SELECT id FROM commands WHERE trash='1'");
             $code = 'CMD-' . date('dmY') . '-' . sprintf("%05d", ($back->rowCount() + 1));
@@ -49,15 +99,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $tracking_code = 'TRK-' . strtoupper(substr(md5(uniqid()), 0, 10));
             
             // Insérer la commande
-            $req = $bdd->prepare("INSERT INTO commands(id,code,product,qty,dlm,subdlm,worker,store,source,package_type,fullname,phone,address,city,price,fees,phase,state,datereported,note,workers,invoiced,tracking_code,dateadd,dateupdate,trash) 
-            VALUES ('0',?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+            $req = $bdd->prepare("INSERT INTO commands(id,code,product,qty,dlm,subdlm,client,worker,store,source,package_type,fullname,phone,address,city,price,fees,phase,state,datereported,note,workers,invoiced,tracking_code,dateadd,dateupdate,trash)
+            VALUES ('0',?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
             $req->execute([
                 $code,
                 $product,
                 $qty,
-                '0',
-                '',
-                '0',
+                null,
+                null,
+                $_SESSION['id'],
+                null,
                 $_SESSION['id'],
                 'Client',
                 $package_type,
@@ -69,7 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 '0',
                 'confirmation',
                 'Nouveau',
-                '',
+                null,
                 $note,
                 '',
                 'off',
@@ -85,11 +136,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             // Logger l'action
             add_audit_log($_SESSION['id'], 'create', 'commands', null, null, ['code' => $code, 'package_type' => $package_type]);
+
+            if ($fromStock) {
+                $bdd->commit();
+            }
             
             $success = 'Colis ajouté avec succès! Code: ' . $code . ' | Tracking: ' . $tracking_code;
             
-        } catch (PDOException $e) {
-            $error = 'Erreur lors de l\'ajout: ' . $e->getMessage();
+        } catch (Throwable $e) {
+            if ($fromStock && $bdd->inTransaction()) {
+                $bdd->rollBack();
+            }
+            $error = $e instanceof RuntimeException
+                ? $e->getMessage()
+                : 'Erreur lors de l\'ajout: ' . $e->getMessage();
         }
     }
 }
@@ -101,6 +161,44 @@ try {
     $cities = $back->fetchAll(PDO::FETCH_COLUMN);
 } catch (PDOException $e) {
     // Ignorer si la table n'existe pas
+}
+
+// Only approved inventory can be selected.  The remaining quantity mirrors the
+// existing stock page calculation, but excludes deleted commands.
+$stockItems = [];
+try {
+    $stockRequest = $bdd->prepare("SELECT id, title, ref, qty FROM stocks WHERE client = ? AND received = 'on' AND trash = '1' ORDER BY title");
+    $stockRequest->execute([$_SESSION['id']]);
+    while ($stock = $stockRequest->fetch()) {
+        $stockId = (string) $stock['id'];
+        $usedRequest = $bdd->prepare(
+            "SELECT product, qty FROM commands
+             WHERE client = ? AND trash = '1' AND code NOT LIKE 'CHANGE-%'
+             AND state NOT IN ('Ajouté', 'Retour client reçu')
+             AND (product = ? OR product LIKE ? OR product LIKE ? OR product LIKE ?)"
+        );
+        $usedRequest->execute([
+            $_SESSION['id'],
+            $stockId,
+            $stockId . ',%',
+            '%,' . $stockId . ',%',
+            '%,' . $stockId,
+        ]);
+        $usedQuantity = 0;
+        while ($usedCommand = $usedRequest->fetch()) {
+            $products = explode(',', (string) $usedCommand['product']);
+            $quantities = explode(',', (string) $usedCommand['qty']);
+            foreach ($products as $index => $commandProduct) {
+                if ($commandProduct === $stockId) {
+                    $usedQuantity += (int) ($quantities[$index] ?? 0);
+                }
+            }
+        }
+        $stock['remaining'] = max(0, (int) $stock['qty'] - $usedQuantity);
+        $stockItems[] = $stock;
+    }
+} catch (PDOException $e) {
+    // The manual product form remains available if stock data cannot be loaded.
 }
 ?>
 <!DOCTYPE html>
@@ -249,6 +347,67 @@ try {
         .info-box li {
             margin-bottom: 5px;
         }
+        .product-source {
+            background: #f8fafc;
+            border: 1px solid #dbe4f0;
+            border-radius: 12px;
+            padding: 16px 18px;
+            transition: border-color .2s, box-shadow .2s, background .2s;
+        }
+        .product-source.is-active {
+            background: #f0fdf4;
+            border-color: #22c55e;
+            box-shadow: 0 0 0 3px #dcfce7;
+        }
+        .stock-choice-label {
+            align-items: center;
+            color: #14532d !important;
+            cursor: pointer;
+            display: flex !important;
+            font-size: 15px;
+            gap: 10px;
+            margin: 0 !important;
+        }
+        .stock-choice-label input[type="checkbox"] {
+            accent-color: #16a34a;
+            height: 18px;
+            margin: 0;
+            padding: 0;
+            width: 18px;
+        }
+        .stock-choice-label i {
+            color: #16a34a;
+            font-size: 17px;
+        }
+        .source-help, .stock-empty-note {
+            color: #64748b;
+            display: block;
+            font-size: 13px;
+            line-height: 1.45;
+            margin: 7px 0 0 28px;
+        }
+        #stock-product-group {
+            animation: stock-choice-in .2s ease-out;
+            background: #f8fffb;
+            border: 1px solid #bbf7d0;
+            border-radius: 12px;
+            padding: 16px;
+        }
+        #stock-product-group label::before {
+            color: #16a34a;
+            content: '✓';
+            margin-right: 7px;
+        }
+        #stock-id {
+            background-color: #fff;
+        }
+        @keyframes stock-choice-in {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @media (max-width: 600px) {
+            .product-source, #stock-product-group { padding: 14px; }
+        }
     </style>
 </head>
 <body>
@@ -336,14 +495,38 @@ try {
                     <input type="text" name="address" value="<?php echo htmlspecialchars($_POST['address'] ?? ''); ?>" required>
                 </div>
                 
-                <div class="form-group">
+                <div class="form-group product-source <?php echo $fromStock ? 'is-active' : ''; ?>" id="product-source-card" style="grid-column: 1 / -1;">
+                    <label class="stock-choice-label">
+                        <input type="checkbox" id="from-stock" name="from_stock" value="1" <?php echo $fromStock ? 'checked' : ''; ?>>
+                        <i class="fa fa-boxes"></i>
+                        Utiliser mon stock disponible
+                    </label>
+                    <small class="source-help">Le produit et la quantité seront déduits de votre stock validé.</small>
+                </div>
+
+                <div class="form-group" id="stock-product-group" style="display:<?php echo $fromStock ? 'block' : 'none'; ?>;">
+                    <label>Produit en stock *</label>
+                    <select name="stock_id" id="stock-id">
+                        <option value="">Sélectionner un produit</option>
+                        <?php foreach ($stockItems as $stock): ?>
+                            <option value="<?php echo (int) $stock['id']; ?>" <?php echo $stockId === (string) $stock['id'] ? 'selected' : ''; ?> <?php echo $stock['remaining'] < 1 ? 'disabled' : ''; ?>>
+                                <?php echo htmlspecialchars($stock['title']); ?> — <?php echo htmlspecialchars($stock['ref']); ?> (reste: <?php echo (int) $stock['remaining']; ?>)
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <?php if (count($stockItems) === 0): ?>
+                        <small class="stock-empty-note">Aucun produit validé n’est disponible dans votre stock.</small>
+                    <?php endif; ?>
+                </div>
+
+                <div class="form-group" id="manual-product-group" style="display:<?php echo $fromStock ? 'none' : 'block'; ?>;">
                     <label>Produit *</label>
-                    <input type="text" name="product" value="<?php echo htmlspecialchars($_POST['product'] ?? ''); ?>" required>
+                    <input type="text" id="manual-product" name="product" value="<?php echo htmlspecialchars($_POST['product'] ?? ''); ?>" <?php echo $fromStock ? '' : 'required'; ?>>
                 </div>
                 
                 <div class="form-group">
                     <label>Quantité</label>
-                    <input type="number" name="qty" value="<?php echo htmlspecialchars($_POST['qty'] ?? '1'); ?>" min="1">
+                    <input type="number" name="qty" value="<?php echo htmlspecialchars($_POST['qty'] ?? '1'); ?>" min="1" required>
                 </div>
                 
                 <div class="form-group" style="grid-column: 1 / -1;">
@@ -370,6 +553,20 @@ try {
                 this.classList.add('active');
                 this.querySelector('input').checked = true;
             });
+        });
+
+        var fromStock = document.getElementById('from-stock');
+        var stockProductGroup = document.getElementById('stock-product-group');
+        var manualProductGroup = document.getElementById('manual-product-group');
+        var manualProduct = document.getElementById('manual-product');
+        var productSourceCard = document.getElementById('product-source-card');
+
+        fromStock.addEventListener('change', function() {
+            var useStock = this.checked;
+            stockProductGroup.style.display = useStock ? 'block' : 'none';
+            manualProductGroup.style.display = useStock ? 'none' : 'block';
+            manualProduct.required = !useStock;
+            productSourceCard.classList.toggle('is-active', useStock);
         });
     </script>
 </body>

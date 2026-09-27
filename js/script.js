@@ -1951,7 +1951,7 @@ function loadTrackingstates(state){
 $(".lx-new-client").on("click",function(){
 	$("#clientsform input[name='fullname']").val("");
 	$("#clientsform input[name='email']").val("").prop("readonly",false).css("cursor","initial");
-	$("#clientsform input[name='password']").val("");
+	$("#clientsform input[name='password']").val("").attr("placeholder","");
 	$("#clientsform input[name='phone']").val("");
 	$("#clientsform input[name='sav']").val("");
 	$("#clientsform select[name='city']").val("");
@@ -1966,7 +1966,7 @@ $(".lx-new-client").on("click",function(){
 $("body").delegate(".lx-edit-client","click",function(){
 	$("#clientsform input[name='fullname']").val($(this).attr("data-fullname"));
 	$("#clientsform input[name='email']").val($(this).attr("data-email"));
-	$("#clientsform input[name='password']").val($(this).attr("data-password"));
+	$("#clientsform input[name='password']").val("").attr("placeholder","Laisser vide pour ne pas modifier");
 	$("#clientsform input[name='phone']").val($(this).attr("data-phone"));
 	$("#clientsform input[name='sav']").val($(this).attr("data-sav"));
 	$("#clientsform select[name='city']").val($(this).attr("data-city"));
@@ -1985,11 +1985,16 @@ $("#clientsform .lx-submit a").on("click",function(){
 	isNotEmpty($("#clientsform input[name='fullname']"));
 	isPhone($("#clientsform input[name='phone']"));
 	isEmail($("#clientsform input[name='email']"));
-	isPassword($("#clientsform input[name='password']"));
+	var clientPassword = $("#clientsform input[name='password']").val();
+	var isNewClient = $("#clientsform input[name='id']").val() === "0";
+	if(isNewClient || clientPassword !== ""){
+		isPassword($("#clientsform input[name='password']"));
+	}
 	if(isNotEmpty($("#clientsform input[name='fullname']"))
 	&& isPhone($("#clientsform input[name='phone']"))
 	&& isEmail($("#clientsform input[name='email']"))
-	&& isPassword($("#clientsform input[name='password']"))){
+	&& (!isNewClient || clientPassword.length >= 6)
+	&& (clientPassword === "" || clientPassword.length >= 6)){
 		var ajaxurl = "ajax.php";
 		$.ajax({
 			url : ajaxurl,
@@ -4048,6 +4053,16 @@ $("#editstateform .lx-submit a").on("click",function(){
 				$(".lx-floating-response").remove();
 				window.clearTimeout(timer);
 				$("body").append('<div class="lx-floating-response"><p class="lx-succes"><i class="material-icons">check</i> Etat enregistré<i class="material-icons">close</i></p></div>');
+				$(".lx-floating-response").fadeIn();
+				timer = window.setTimeout(function(){
+					$(".lx-floating-response").fadeOut();
+				},5000);
+			},
+			error : function(){
+				$("#editstateform .lx-submit a i").remove();
+				$(".lx-floating-response").remove();
+				window.clearTimeout(timer);
+				$("body").append('<div class="lx-floating-response"><p class="lx-error"><i class="material-icons">error_outline</i> Impossible d’enregistrer l’état. Vérifiez le serveur puis réessayez.<i class="material-icons">close</i></p></div>');
 				$(".lx-floating-response").fadeIn();
 				timer = window.setTimeout(function(){
 					$(".lx-floating-response").fadeOut();

@@ -6,8 +6,9 @@ if(!isset($_SESSION['id'])){
 	header('location: login.php');
 }
 else{
-	if(!preg_match("#Modérateurs#",$_SESSION['roles'])){	
-		header('location: 404.php');
+	if($_SESSION['type'] != "moderator" OR !preg_match("#Modérateurs#",$_SESSION['roles'])){
+	header('location: 404.php');
+	exit;
 	}
 }
 

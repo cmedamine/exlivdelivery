@@ -39,7 +39,7 @@
 					$row = $back->fetch();
 					?>
 				<div class="lx-g4 lx-pl-0 lx-pb-0 lx-plr-0-mob">
-					<div class="lx-state-count" style="border-bottom:5px solid #7EC855;background:<?php echo RGBTOHex('#7EC855');?>">
+					<div class="lx-state-count" style="border-bottom:5px solid #EC7C27;background:<?php echo RGBTOHex('#EC7C27');?>">
 						<a href="factures.php?type=client&received=off">
 							<span>Factures clients à versés</span>
 							<div class="lx-clear-fix"></div>
@@ -57,7 +57,7 @@
 					$row = $back->fetch();
 					?>
 				<div class="lx-g4 lx-pl-0 lx-pb-0 lx-plr-0-mob">
-					<div class="lx-state-count" style="border-bottom:5px solid #7EC855;background:<?php echo RGBTOHex('#7EC855');?>">
+					<div class="lx-state-count" style="border-bottom:5px solid #EC7C27;background:<?php echo RGBTOHex('#EC7C27');?>">
 						<a href="factures.php?type=dlm&received=off">
 							<span>Factures livreurs à versés</span>
 							<div class="lx-clear-fix"></div>
@@ -88,7 +88,7 @@
 					$row = $back->fetch();
 					?>
 				<div class="lx-g4 lx-plr-0 lx-pb-0 lx-plr-0-mob">
-					<div class="lx-state-count" style="border-bottom:5px solid #7EC855;background:<?php echo RGBTOHex('#7EC855');?>">
+					<div class="lx-state-count" style="border-bottom:5px solid #EC7C27;background:<?php echo RGBTOHex('#EC7C27');?>">
 						<a href="javascript:;">
 							<span>Benifices</span>
 							<div class="lx-clear-fix"></div>
@@ -130,7 +130,7 @@
 					$row = $back->fetch();
 					?>
 				<div class="lx-g2 lx-pl-0 lx-pb-0 lx-plr-0-mob">
-					<div class="lx-state-count" style="border-bottom:5px solid #7EC855;background:<?php echo RGBTOHex('#7EC855');?>">
+					<div class="lx-state-count" style="border-bottom:5px solid #EC7C27;background:<?php echo RGBTOHex('#EC7C27');?>">
 						<a href="javascript:;">
 							<span>Total chiffre d'affaires</span>
 							<div class="lx-clear-fix"></div>
@@ -145,7 +145,7 @@
 					$row = $back->fetch();
 					?>
 				<div class="lx-g2 lx-pl-0 lx-pb-0 lx-plr-0-mob">
-					<div class="lx-state-count" style="border-bottom:5px solid #7EC855;background:<?php echo RGBTOHex('#7EC855');?>">
+					<div class="lx-state-count" style="border-bottom:5px solid #EC7C27;background:<?php echo RGBTOHex('#EC7C27');?>">
 						<a href="factures.php?type=client&received=off">
 							<span>Factures à versées</span>
 							<div class="lx-clear-fix"></div>
@@ -187,7 +187,7 @@
 					$row = $back->fetch();
 					?>
 				<div class="lx-g2 lx-pl-0 lx-pb-0 lx-plr-0-mob">
-					<div class="lx-state-count" style="border-bottom:5px solid #7EC855;background:<?php echo RGBTOHex('#7EC855');?>">
+					<div class="lx-state-count" style="border-bottom:5px solid #EC7C27;background:<?php echo RGBTOHex('#EC7C27');?>">
 						<a href="factures.php?type=dlm&received=off">
 							<span>Factures à versées</span>
 							<div class="lx-clear-fix"></div>
@@ -202,7 +202,7 @@
 					$row = $back->fetch();
 					?>
 				<div class="lx-g2 lx-pl-0 lx-pb-0 lx-plr-0-mob">
-					<div class="lx-state-count" style="border-bottom:5px solid #7EC855;background:<?php echo RGBTOHex('#7EC855');?>">
+					<div class="lx-state-count" style="border-bottom:5px solid #EC7C27;background:<?php echo RGBTOHex('#EC7C27');?>">
 						<a href="javascript:;">
 							<span>Benifices</span>
 							<div class="lx-clear-fix"></div>
@@ -232,7 +232,7 @@
 					$back = $bdd->query("SELECT c.id FROM commands c,trackingstates t WHERE c.state=t.state AND kpi='Livrées' AND archived='0' AND c.trash='1'".$req);
 					?>
 				<div class="lx-g4 lx-pl-0 lx-pb-0 lx-plr-0-mob">
-					<div class="lx-state-count" style="border-bottom:5px solid #7EC855;background:<?php echo RGBTOHex('#7EC855');?>">
+					<div class="lx-state-count" style="border-bottom:5px solid #EC7C27;background:<?php echo RGBTOHex('#EC7C27');?>">
 						<a href="commands.php?s=Livré">
 							<span>Livrées</span>
 							<div class="lx-clear-fix"></div>

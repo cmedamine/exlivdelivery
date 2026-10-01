@@ -1,21 +1,10 @@
 <div class="lx-main-menu">
 	<a href="javascript:;" class="lx-mobile-menu-hide"><i class="material-icons">close</i></a>
-		<?php
-		if($settings['appname'] == "Hbabna Livraison"){
-			?>
-	<div class="lx-logo" style="padding:10px;margin:0px;">
-		<a href="index.php"><img src="images/logo1.png" style="width:150px;" /></a>
-	</div>
-			<?php
-		}
-		else{
-			?>
 	<div class="lx-logo">
-		<a href="index.php"><?php echo $settings['appname'];?></a>
+		<a href="index.php" aria-label="<?php echo htmlspecialchars($settings['appname'], ENT_QUOTES, 'UTF-8'); ?>">
+			<img class="lx-logo-image" src="images/logo-mark-CFsHaYkQ-white-box.png" alt="<?php echo htmlspecialchars($settings['appname'], ENT_QUOTES, 'UTF-8'); ?>" />
+		</a>
 	</div>
-			<?php
-		}
-		?>
 	<ul>
 	<ul>
 		<li <?php echo ($_SESSION['type'] == "moderator")?'':'style="display:none;"';?>><a href="index.php" class="<?php if(basename($_SERVER['PHP_SELF']) == "index.php"){echo 'active';}?>"><i class="fa fa-chart-bar"></i>Statistiques</a></li>

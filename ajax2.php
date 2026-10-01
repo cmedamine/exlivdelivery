@@ -1410,7 +1410,7 @@ if(isset($_SESSION['id']) AND isset($_SESSION['fullname'])){
 							if($_SESSION['type'] != "moderator"){
 								if($row['received'] == "on"){
 									?>
-								<span style="display:inline-block;padding:2px 5px;font-weight:500;background:#71b44c;color:#FFFFFF;border-radius:4px;">Oui</span>
+								<span style="display:inline-block;padding:2px 5px;font-weight:500;background:#EC7C27;color:#FFFFFF;border-radius:4px;">Oui</span>
 									<?php
 								}
 								else{
@@ -1586,7 +1586,7 @@ if(isset($_SESSION['id']) AND isset($_SESSION['fullname'])){
 							if($_SESSION['type'] != "moderator"){
 								if($row['received'] == "on"){
 									?>
-								<span style="display:inline-block;padding:2px 5px;font-weight:500;background:#71b44c;color:#FFFFFF;border-radius:4px;">Oui</span>
+								<span style="display:inline-block;padding:2px 5px;font-weight:500;background:#EC7C27;color:#FFFFFF;border-radius:4px;">Oui</span>
 									<?php
 								}
 								else{
@@ -2691,7 +2691,7 @@ if(isset($_SESSION['id']) AND isset($_SESSION['fullname'])){
 								}
 								else{
 									?>
-						<span style="display:inline-block;padding:2px 5px;font-weight:500;background:#71b44c;color:#FFFFFF;border-radius:4px;">Oui</span>
+						<span style="display:inline-block;padding:2px 5px;font-weight:500;background:#EC7C27;color:#FFFFFF;border-radius:4px;">Oui</span>
 									<?php
 								}
 							}
@@ -2712,7 +2712,7 @@ if(isset($_SESSION['id']) AND isset($_SESSION['fullname'])){
 								}
 								else{
 									?>
-						<span style="display:inline-block;padding:2px 5px;font-weight:500;background:#71b44c;color:#FFFFFF;border-radius:4px;">Oui</span>
+						<span style="display:inline-block;padding:2px 5px;font-weight:500;background:#EC7C27;color:#FFFFFF;border-radius:4px;">Oui</span>
 									<?php
 								}
 							}
@@ -3065,7 +3065,7 @@ if(isset($_SESSION['id']) AND isset($_SESSION['fullname'])){
 								}
 								else{
 									?>
-							<span style="display:inline-block;padding:2px 5px;font-weight:500;background:#71b44c;color:#FFFFFF;border-radius:4px;">Oui</span>
+							<span style="display:inline-block;padding:2px 5px;font-weight:500;background:#EC7C27;color:#FFFFFF;border-radius:4px;">Oui</span>
 									<?php
 								}
 							}
@@ -3470,7 +3470,7 @@ if(isset($_SESSION['id']) AND isset($_SESSION['fullname'])){
 							else{
 								if($row['validated'] == "on"){
 									?>
-							<span style="display:inline-block;padding:2px 5px;font-weight:500;background:#71b44c;color:#FFFFFF;border-radius:4px;">Oui</span>
+							<span style="display:inline-block;padding:2px 5px;font-weight:500;background:#EC7C27;color:#FFFFFF;border-radius:4px;">Oui</span>
 									<?php
 								}
 								else{
@@ -3510,7 +3510,7 @@ if(isset($_SESSION['id']) AND isset($_SESSION['fullname'])){
 								}
 								else{
 									?>
-							<span style="display:inline-block;padding:2px 5px;font-weight:500;background:#71b44c;color:#FFFFFF;border-radius:4px;">Oui</span>
+							<span style="display:inline-block;padding:2px 5px;font-weight:500;background:#EC7C27;color:#FFFFFF;border-radius:4px;">Oui</span>
 									<?php
 								}
 							}

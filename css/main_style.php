@@ -14,7 +14,7 @@ include("../config.php");
 	display:flex;
 	width:35%;
 	height:100%;
-	background:#367751;
+	background:#111E3D;
 }
 .lx-right-bg{
 	position:fixed;
@@ -80,7 +80,7 @@ include("../config.php");
 }
 .lx-password-forgotten{
 	float:right;
-	color:#8bc53d;
+	color:#EC7C27;
 }
 .lx-login-error{
 	margin-bottom:20px;
@@ -119,6 +119,11 @@ include("../config.php");
 	line-height:20px;
 	text-transform:uppercase;
 	color:#FFFFFF;
+}
+.lx-logo .lx-logo-image{
+	display:block;
+	width:150px;
+	height:auto;
 }
 .lx-header-admin{
 	float:right;
@@ -245,7 +250,7 @@ include("../config.php");
 	left:0px;	
 	width:230px;
 	height:100%;
-	background:#367751;
+	background:#111E3D;
 	transition:all ease 0.3s;
 	overflow:auto;
 }
@@ -347,7 +352,7 @@ include("../config.php");
 		display:inline-block;
 		margin:15px;
 		text-decoration:underline;
-		color:#8bc53d;
+		color:#EC7C27;
 	}
 }
 .lx-kpi{
@@ -375,7 +380,7 @@ include("../config.php");
 	background:#d11141;
 }
 .lx-00b159{
-	background:#00b159;
+	background:#EC7C27;
 }
 .lx-00aedb{
 	background:#00aedb;
@@ -429,7 +434,7 @@ include("../config.php");
 	float:right;
 }
 .lx-data-list-content ul li a{
-	color:#8bc53d;
+	color:#EC7C27;
 }
 .lx-page-header{
 	padding:20px;
@@ -472,7 +477,7 @@ include("../config.php");
 	padding:8px 10px;
 	font-weight:500;
 	color:#FFFFFF;
-	background:#8bc53d;
+	background:#EC7C27;
 }
 .lx-submenu li a:hover{
 	box-shadow:0px 0px 5px #BEBEBE;
@@ -482,7 +487,7 @@ include("../config.php");
 	padding:10px;
 	font-size:13px;
 	font-weight:500;
-	background:#8bc53d;
+	background:#EC7C27;
 	color:#FFFFFF;
 }
 .lx-page-content{
@@ -503,11 +508,11 @@ include("../config.php");
 	padding:10px;
 	font-size:13px;
 	font-weight:500;
-	background:#8bc53d;
+	background:#EC7C27;
 	color:#FFFFFF;
 }
 .lx-demandramassage a.lx-demandramassage-btn:hover{
-	background:#8bc53d;
+	background:#EC7C27;
 }
 .lx-add-form label.lx-date{
 	position:relative;
@@ -541,7 +546,7 @@ include("../config.php");
 	padding:10px;
 	font-size:13px;
 	font-weight:500;
-	background:#8bc53d;
+	background:#EC7C27;
 	color:#FFFFFF;
 }
 @media(max-width:768px){
@@ -551,7 +556,7 @@ include("../config.php");
 	}
 }
 .lx-add-form a.lx-new:hover{
-	background:#8bc53d;
+	background:#EC7C27;
 }
 .lx-add-form a.lx-new input{
 	position:absolute;
@@ -692,7 +697,7 @@ include("../config.php");
 	padding:10px;
 	font-size:13px;
 	font-weight:500;
-	background:#8bc53d;
+	background:#EC7C27;
 	color:#FFFFFF;
 }
 .lx-login .lx-submit{
@@ -703,10 +708,10 @@ include("../config.php");
 	padding:15px 20px;
 	font-size:16px;
 	text-align:center;
-	background:#8bc53d;
+	background:#EC7C27;
 }
 .lx-submit a:hover,.lx-submit-add a:hover{
-	background:#8bc53d;
+	background:#EC7C27;
 }
 .lx-submit-add-variant{
 	position:relative;
@@ -819,7 +824,7 @@ include("../config.php");
 }
 .lx-table table tr td > a{
 	font-size:12px;
-	color:#8bc53d;
+	color:#EC7C27;
 }
 .lx-table table tr td a.lx-delete{
 	color:#CC0000;
@@ -951,11 +956,11 @@ include("../config.php");
 	padding:10px;
 	font-size:13px;
 	font-weight:500;
-	background:#8bc53d;
+	background:#EC7C27;
 	color:#FFFFFF;
 }
 .lx-medias-toolbar:hover a{
-	background:#8bc53d;
+	background:#EC7C27;
 }
 .lx-medias-toolbar input{
 	position:absolute;
@@ -1053,7 +1058,7 @@ include("../config.php");
 	border-bottom:3px solid #e50000;
 }
 .lx-floating-response p.lx-succes{
-	border-bottom:3px solid green;
+	border-bottom:3px solid #EC7C27;
 }
 .lx-floating-response p i{
 	position:relative;
@@ -1169,7 +1174,7 @@ include("../config.php");
 	font-size:12px;
 	font-weight:500;
 	color:#FFFFFF;
-	background:#7EC855;
+	background:#EC7C27;
 	border-radius:4px;
 }
 .lx-cleaner{
@@ -1181,7 +1186,7 @@ include("../config.php");
 	margin:30px 0px;
 }
 .lx-cleaner h4 i{
-	color:#7EC855;
+	color:#EC7C27;
 }
 .lx-loading{
 	position:absolute;
@@ -1449,7 +1454,7 @@ input[readonly]{
 	right:0px;
 }
 .lx-add-form a.lx-import-colis{
-	background:#7EC855;
+	background:#EC7C27;
 }
 .lx-importer{
 	position:relative;
@@ -1549,7 +1554,7 @@ input[readonly]{
 	display:inline-block;
 	padding:10px 30px;
 	font-weight:500;
-	background:#8bc53d;
+	background:#EC7C27;
 	color:#FFFFFF;
 }
 .lx-details-products ul{
@@ -1632,11 +1637,11 @@ input[readonly]{
 	padding:10px;
 	font-size:13px;
 	font-weight:500;
-	background:#8bc53d;
+	background:#EC7C27;
 	color:#FFFFFF;
 }
 .lx-action-bulk:hover a{
-	background:#8bc53d;
+	background:#EC7C27;
 }
 tr[data-row]{
 	display:none;
@@ -1648,7 +1653,7 @@ tr[data-row]{
 	width:calc(100% - 80px);
 }
 .lx-thumbs-up{
-	color:#7EC855;
+	color:#EC7C27;
 }
 .lx-thumbs-down{
 	color:#CC0000;
@@ -1808,7 +1813,7 @@ tr[data-row]{
 	margin-left:0px;
 }
 .lx-add-form-nav ul li span.active{
-	background:#8bc53d;
+	background:#EC7C27;
 	color:#FFFFFF;
 }
 .lx-add-form-nav ul li span::before{
@@ -1824,7 +1829,7 @@ tr[data-row]{
 	display:none;
 }
 .lx-add-form-nav ul li span.active::before{
-	background:#8bc53d;
+	background:#EC7C27;
 }
 .lx-add-command-product{
 	position:relative;
@@ -1850,14 +1855,14 @@ tr[data-row]{
 	padding:10px;
 	font-size:13px;
 	font-weight:500;
-	background:#8bc53d;
+	background:#EC7C27;
 	color:#FFFFFF;
 }
 .lx-show-variants{
 	float:right;
 	display:inline-block;
 	margin:15px 15px 0px 0px;
-	color:#8bc53d;
+	color:#EC7C27;
 }
 #productsform input[name='other']{
 	width:calc(100% - 34px);
@@ -1900,7 +1905,7 @@ tr[data-row]{
 	padding:10px;
 	font-size:13px;
 	font-weight:500;
-	background:#8bc53d;
+	background:#EC7C27;
 	color:#FFFFFF;	
 }
 .daterangepicker{
@@ -1953,7 +1958,7 @@ tr[data-row]{
 	background:#FAFAFA;
 }
 .lx-all-states ul li a.active{
-	background:#8bc53d;
+	background:#EC7C27;
 	color:#FFFFFF;
 }
 .lx-command-history{
@@ -2086,7 +2091,7 @@ tr[data-row]{
 	display:inline-block;
 	margin-top:5px;
 	margin-left:15px;
-	color:#8bc53d;
+	color:#EC7C27;
 }
 .lx-remove-this-stock{
 	float:right;
@@ -2116,7 +2121,7 @@ tr[data-row]{
 	padding:5px;
 	font-weight:500;
 	text-align:center;
-	background:#8bc53d;
+	background:#EC7C27;
 	color:#FFFFFF !important;
 }
 .lx-receipt-img{
@@ -2190,7 +2195,7 @@ tr[data-row]{
 	border-radius:4px;
 }
 .lx-stats-bloc ul li a.active{
-	background:#8bc53d;
+	background:#EC7C27;
 	color:#FFFFFF;
 }
 .lx-chart-container{
@@ -2251,9 +2256,9 @@ tr[data-row]{
 	padding:7px 8px;
 	font-weight:500;
 	text-align:center;
-	background:#8bc53d;
+	background:#EC7C27;
 	color:#FFFFFF;
-	border:1px solid #8bc53d;
+	border:1px solid #EC7C27;
 	border-radius:2px;	
 }
 .lx-state-empty{
@@ -2276,7 +2281,7 @@ tr[data-row]{
 	padding:7px 8px;
 	font-size:16px;
 	text-align:center;
-	background:#8bc53d;
+	background:#EC7C27;
 	color:#FFFFFF;
 	border-radius:2px;
 }
@@ -2306,7 +2311,7 @@ tr[data-row]{
 	margin-bottom:5px;
 	padding:5px 10px;
 	font-weight:500;
-	background:#8bc53d;
+	background:#EC7C27;
 	color:#FFFFFF;
 }
 .lx-start-update{
@@ -2318,7 +2323,7 @@ tr[data-row]{
 	margin-top:20px;
 	padding:5px 10px;
 	font-weight:500;
-	background:#8bc53d;
+	background:#EC7C27;
 	color:#FFFFFF;
 }
 .lx-start-update pre{

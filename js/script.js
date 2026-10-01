@@ -249,7 +249,7 @@ function loadChartData(){
 
 function loadChart(){
 	Highcharts.setOptions({
-		colors: ['#7EC855','#CC0000'],
+		colors: ['#EC7C27','#CC0000'],
 	});
 	Highcharts.chart('salescontainer', {
 		chart: {
@@ -481,8 +481,8 @@ function uploadsImages(picture){
 }
 
 $("#importcommands").on("change",function(){
-	$(".lx-importer").css({"border-color":"green","background":"#d1e8cc"});
-	$(".lx-importer span").text($(this).val().replace(/C:\\fakepath\\/i, '')).css({"font-weight":"bold","color":"green"});
+	$(".lx-importer").css({"border-color":"#EC7C27","background":"#FCE5D6"});
+	$(".lx-importer span").text($(this).val().replace(/C:\\fakepath\\/i, '')).css({"font-weight":"bold","color":"#EC7C27"});
 });
 
 $("#importform .lx-submit a").on("click",function(){
@@ -530,8 +530,8 @@ function uploadsXLSCommand(file,client,format,state,phase,confirmed){
 }
 
 $("#importstates").on("change",function(){
-	$(".lx-importer").css({"border-color":"green","background":"#d1e8cc"});
-	$(".lx-importer span").text($(this).val().replace(/C:\\fakepath\\/i, '')).css({"font-weight":"bold","color":"green"});
+	$(".lx-importer").css({"border-color":"#EC7C27","background":"#FCE5D6"});
+	$(".lx-importer span").text($(this).val().replace(/C:\\fakepath\\/i, '')).css({"font-weight":"bold","color":"#EC7C27"});
 });
 
 $("#importstateform .lx-submit a").on("click",function(){

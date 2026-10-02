@@ -90,7 +90,7 @@ include("../config.php");
 }
 .lx-header{
 	position:fixed;
-	z-index:9;
+	z-index:10000;
 	top:0px;
 	left:0px;
 	width:100%;
@@ -160,6 +160,7 @@ include("../config.php");
 }
 .lx-account-settings{
 	position:absolute;
+	z-index:9999;
 	top:60px;
 	right:0px;
 	display:none;
@@ -168,8 +169,14 @@ include("../config.php");
 	box-shadow:0px 0px 10px #BEBEBE;
 	border-radius:10px;
 	overflow:hidden;
+	pointer-events:auto;
 }
 .lx-account-settings div{
+	padding:15px;
+	background:#FCFCFC;
+	border-bottom:1px solid #d3d3d3;
+}
+.lx-account-settings .lx-account-identity{
 	padding:15px;
 	background:#FCFCFC;
 	border-bottom:1px solid #d3d3d3;
@@ -245,7 +252,7 @@ include("../config.php");
 }
 .lx-main-leftside{
 	position:fixed;
-	z-index:10;
+	z-index:10001;
 	top:0px;
 	left:0px;	
 	width:230px;

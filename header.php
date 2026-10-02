@@ -1,14 +1,26 @@
 <div class="lx-header-content">
+	<?php
+	$profilePicture = basename((string) ($_SESSION['picture'] ?? ''));
+	$croppedProfilePath = __DIR__ . '/uploads/cropped_' . $profilePicture;
+	$originalProfilePath = __DIR__ . '/uploads/' . $profilePicture;
+	if ($profilePicture !== '' && file_exists($croppedProfilePath)) {
+		$profilePictureUrl = 'uploads/cropped_' . rawurlencode($profilePicture);
+	} elseif ($profilePicture !== '' && file_exists($originalProfilePath)) {
+		$profilePictureUrl = 'uploads/' . rawurlencode($profilePicture);
+	} else {
+		$profilePictureUrl = 'images/avatar.png';
+	}
+	?>
 	<a href="javascript:;" class="lx-mobile-menu"><i class="material-icons">menu</i></a>
 	<div class="lx-header-admin">
 		<ul>
 			<li>
-				<img src="uploads/cropped_<?php echo $_SESSION['picture'];?>" class="lx-account-menu-toggle" role="button" tabindex="0" aria-label="Ouvrir le menu du compte" aria-expanded="false" />
+				<img src="<?php echo htmlspecialchars($profilePictureUrl, ENT_QUOTES, 'UTF-8');?>" class="lx-account-menu-toggle" role="button" tabindex="0" aria-label="Ouvrir le menu du compte" aria-expanded="false" onerror="this.onerror=null;this.src='images/avatar.png';" />
 				<div class="lx-account-settings" aria-hidden="true">
-					<div>
+					<a href="account.php" class="lx-account-identity" style="display:block;cursor:pointer;pointer-events:auto;position:relative;z-index:2147483647;">
 						<strong><?php echo $_SESSION['fullname'];?></strong>
 						<p><?php echo $_SESSION['email'];?></p>
-					</div>
+					</a>
 					<a href="account.php"><i class="fa fa-user"></i> Mon profile</a>
 					<a href="account.php"><i class="fa fa-lock"></i> Changer mot de passe</a>
 					<a href="settings.php"><i class="fa fa-cog"></i> Paramétres</a>
@@ -20,7 +32,7 @@
 					<?php
 					}
 					?>
-					<a href="disconnect.php"><i class="fa fa-power-off"></i> Déconnexion</a>
+					<a href="logout.php" class="lx-logout-link" onclick="window.location.assign('logout.php'); return false;" onmouseover="this.style.cursor='pointer';" style="display:block !important;width:100% !important;color:#c94b32 !important;opacity:1 !important;pointer-events:auto !important;position:relative;z-index:2147483647;cursor:pointer !important;"><i class="fa fa-power-off"></i> Déconnexion</a>
 				</div>
 			</li>
 			<div class="lx-clear-fix"></div>

@@ -10,7 +10,7 @@
 </FilesMatch>
 
 # Empêcher l'accès direct aux fichiers sensibles
-<FilesMatch "^functions\.php$">
+<FilesMatch "^(functions|auth_routing)\.php$">
     Order allow,deny
     Deny from all
 </FilesMatch>

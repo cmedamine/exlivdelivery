@@ -591,6 +591,20 @@ CREATE TABLE IF NOT EXISTS `csrf_tokens` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
+-- Table: auth_rate_limits
+-- Description: Limitation des tentatives de connexion publique
+-- ============================================
+CREATE TABLE IF NOT EXISTS `auth_rate_limits` (
+  `rate_key` varchar(80) NOT NULL,
+  `window_started` int(11) NOT NULL,
+  `attempts` int(11) NOT NULL DEFAULT 0,
+  `blocked_until` int(11) NOT NULL DEFAULT 0,
+  `updated_at` int(11) NOT NULL,
+  PRIMARY KEY (`rate_key`),
+  KEY `auth_rate_limits_updated_at` (`updated_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
 -- Table: ecommerce_integrations
 -- Description: Intégrations e-commerce par client (Youcan, Shopify, Google Sheets)
 -- ============================================

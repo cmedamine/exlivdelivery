@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 760" role="img" aria-labelledby="title desc">
+  <title id="title">Carte de couverture EXLIV Delivery au Maroc</title>
+  <desc id="desc">Carte stylisée du Maroc avec les principales villes desservies.</desc>
+  <rect width="620" height="760" fill="transparent"/>
+  <path d="M433 20L452 15L490 49L516 45L542 51L568 54L580 71L591 111L609 160L603 199L575 224L541 248L513 272L476 296L438 311L400 344L362 359L326 371L291 384L272 412L272 468L222 549L158 642L121 664L11 747L38 707L51 607L90 558L105 490L155 413L197 368L234 332L272 311L279 262L291 213L309 171L332 133L362 103L400 78L424 54Z" fill="#e88a28" fill-opacity=".08" stroke="#e88a28" stroke-width="3" stroke-linejoin="round"/>
+  <g fill="#e88a28" stroke="#fff" stroke-width="2">
+    <circle cx="435" cy="21" r="7"/><circle cx="574" cy="77" r="5"/><circle cx="539" cy="50" r="5"/><circle cx="581" cy="82" r="7"/><circle cx="401" cy="92" r="5"/><circle cx="389" cy="103" r="7"/><circle cx="425" cy="125" r="7"/><circle cx="309" cy="117" r="7"/><circle cx="452" cy="229" r="7"/><circle cx="389" cy="270" r="7"/><circle cx="263" cy="323" r="7"/><circle cx="229" cy="393" r="7"/><circle cx="155" cy="504" r="7"/><circle cx="90" cy="557" r="7"/><circle cx="48" cy="668" r="7"/>
+  </g>
+  <g fill="#263a61" font-family="Barlow, Arial, sans-serif" font-size="16" font-weight="600">
+    <text x="445" y="25">Tanger</text><text x="590" y="87">Oujda</text><text x="399" y="98">Rabat</text><text x="320" y="123">Casablanca</text><text x="462" y="235">Fès</text><text x="399" y="276">Meknès</text><text x="273" y="329">Marrakech</text><text x="239" y="399">Agadir</text><text x="165" y="510">Laâyoune</text><text x="100" y="563">Dakhla</text>
+  </g>
+</svg>

@@ -62,8 +62,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tracking_code'])) {
             box-sizing: border-box;
         }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Barlow', Arial, sans-serif;
+            background: #f6f8fc;
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -72,8 +72,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tracking_code'])) {
         }
         .container {
             background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            border-radius: 0;
+            border: 1px solid #e4e9f1;
+            box-shadow: 0 8px 24px rgba(17,39,78,0.07);
             max-width: 800px;
             width: 100%;
             padding: 40px;
@@ -83,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tracking_code'])) {
             margin-bottom: 40px;
         }
         .header h1 {
-            color: #667eea;
+            color: #263a61;
             font-size: 32px;
             font-weight: bold;
             margin-bottom: 10px;
@@ -101,20 +102,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tracking_code'])) {
             flex: 1;
             padding: 15px 20px;
             border: 2px solid #e0e0e0;
-            border-radius: 10px;
+            border-radius: 3px;
             font-size: 16px;
             transition: border-color 0.3s;
         }
         .search-box input:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #e88a28;
         }
         .search-box button {
             padding: 15px 30px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #e88a28;
             color: white;
             border: none;
-            border-radius: 10px;
+            border-radius: 3px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
@@ -132,8 +133,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tracking_code'])) {
             border-left: 4px solid #c33;
         }
         .tracking-result {
-            background: #f8f9fa;
-            border-radius: 10px;
+            background: #f6f8fc;
+            border-radius: 0;
+            border: 1px solid #e4e9f1;
             padding: 30px;
         }
         .tracking-header {
@@ -142,16 +144,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tracking_code'])) {
             align-items: center;
             margin-bottom: 20px;
             padding-bottom: 20px;
-            border-bottom: 2px solid #e0e0e0;
+            border-bottom: 1px solid #e4e9f1;
         }
         .tracking-code {
             font-size: 24px;
             font-weight: bold;
-            color: #667eea;
+            color: #263a61;
         }
         .tracking-status {
             padding: 8px 20px;
-            border-radius: 20px;
+            border-radius: 3px;
             font-weight: 600;
             font-size: 14px;
         }
@@ -170,7 +172,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tracking_code'])) {
         .info-item {
             background: white;
             padding: 15px;
-            border-radius: 8px;
+            border-radius: 3px;
+            border: 1px solid #e4e9f1;
         }
         .info-label {
             font-size: 12px;
@@ -217,7 +220,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tracking_code'])) {
             width: 32px;
             height: 32px;
             border-radius: 50%;
-            background: #667eea;
+            background: #e88a28;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -229,7 +232,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tracking_code'])) {
             flex: 1;
             background: white;
             padding: 15px;
-            border-radius: 8px;
+            border-radius: 3px;
+            border: 1px solid #e4e9f1;
         }
         .timeline-state {
             font-weight: 600;
@@ -258,7 +262,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tracking_code'])) {
             border-top: 1px solid #e0e0e0;
         }
         .footer a {
-            color: #667eea;
+            color: #e88a28;
             text-decoration: none;
             font-weight: 600;
         }

@@ -9,7 +9,9 @@ session_start();
 include("config.php");
 
 if(!isset($_SESSION['id'])){
-	header('location: login.php');
+	// The domain root is the public landing page. Authenticated users continue
+	// directly to their workspace below.
+	header('location: home.php');
 	exit;
 }
 else{

@@ -22,7 +22,7 @@ if(isset($_GET['code'])){
 			$city = $back->fetch();	
 			$back = $bdd->query("SELECT price FROM packaging WHERE id='".$command['package']."' AND trash='1'");
 			$package = $back->fetch();
-			$price = $command['price'] - $city['deliveredfees'] - intval($package['price']);
+			$price = $command['price'] - $city['deliveredfees'] - intval($package['price']) - (float)($command['fees'] ?? 0);
 			$req = $bdd->prepare("INSERT INTO facturesdetails VALUES ('0','".$row['code']."','".$command['id']."')");
 			$req->execute();
 			$req = $bdd->prepare("UPDATE factures SET nbcommands=(nbcommands+1),price=(price+".$price.") WHERE code='".$row['code']."'");
@@ -36,7 +36,7 @@ if(isset($_GET['code'])){
 			$city = $back->fetch();
 			$back = $bdd->query("SELECT price FROM packaging WHERE id='".$command['package']."' AND trash='1'");
 			$package = $back->fetch();
-			$price = $command['price'] - $city['deliveredfees'] - intval($package['price']);						
+			$price = $command['price'] - $city['deliveredfees'] - intval($package['price']) - (float)($command['fees'] ?? 0);
 			$rand = '';
 			do{
 				$rand = 'FCT-'.gmdate('dmY').'-'.random();
@@ -86,7 +86,7 @@ if(isset($_GET['code'])){
 		$city = $back->fetch();
 		$back = $bdd->query("SELECT price FROM packaging WHERE id='".$command['package']."' AND trash='1'");
 		$package = $back->fetch();
-		$price = $command['price'] - $city['deliveredfees'] - intval($package['price']);						
+		$price = $command['price'] - $city['deliveredfees'] - intval($package['price']) - (float)($command['fees'] ?? 0);
 		$back = $bdd->query("SELECT facture FROM facturesdetails WHERE command='".$command['id']."' AND facture IN(SELECT code FROM factures WHERE client='".$command['client']."' AND dlm='0')");
 		$row = $back->fetch();
 		$req = $bdd->prepare("DELETE FROM facturesdetails WHERE command='".$command['id']."' AND facture IN(SELECT code FROM factures WHERE client='".$command['client']."' AND dlm='0')");

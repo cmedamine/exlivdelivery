@@ -21,6 +21,13 @@ $error = '';
 $success = '';
 $fromStock = false;
 $stockId = '';
+$packageTypePrices = [];
+try {
+    $packageTypePrices = $bdd->query("SELECT package_type, price FROM package_type_prices WHERE active='1'")->fetchAll(PDO::FETCH_KEY_PAIR) ?: [];
+} catch (PDOException $e) {
+    // The migration creates this table; fail closed until it has been applied.
+}
+$allowedPackageTypes = ['particulier', 'rapide', 'normal'];
 
 // Traitement du formulaire d'ajout
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -41,6 +48,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Veuillez remplir tous les champs obligatoires.';
     } elseif (!validate_phone($phone)) {
         $error = 'Numéro de téléphone invalide.';
+    } elseif (!in_array($package_type, $allowedPackageTypes, true)) {
+        $error = 'Type de colis invalide.';
+    } elseif (!array_key_exists($package_type, $packageTypePrices)) {
+        $error = 'Le tarif de ce type de colis n’est pas encore configuré.';
     } elseif (!is_numeric($price) || !ctype_digit((string) $qty) || (int) $qty < 1) {
         $error = 'Le prix et la quantité doivent être des nombres valides.';
     } elseif ($fromStock && !ctype_digit($stockId)) {
@@ -117,7 +128,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $address,
                 $city,
                 $price,
-                '0',
+                number_format((float) $packageTypePrices[$package_type], 2, '.', ''),
                 'confirmation',
                 'Nouveau',
                 null,
@@ -432,11 +443,12 @@ try {
         <?php endif; ?>
         
         <div class="info-box">
-            <h4>📋 Types de colis disponibles</h4>
+            <h4>📋 Types de colis et tarifs</h4>
+            <p>Le tarif du type choisi est ajouté aux frais de livraison dans le calcul de la facture client.</p>
             <ul>
-                <li><strong>Particulier:</strong> Pour les envois personnels, livraison en 24-48h</li>
-                <li><strong>Rapide:</strong> Livraison express en 12-24h</li>
-                <li><strong>Normal:</strong> Livraison standard en 48-72h</li>
+                <li><strong>Colis passager:</strong> <?php echo htmlspecialchars(number_format((float)($packageTypePrices['particulier'] ?? 0), 2, ',', ' ')); ?> <?php echo htmlspecialchars($settings['currency'] ?? 'MAD'); ?></li>
+                <li><strong>Colis express:</strong> <?php echo htmlspecialchars(number_format((float)($packageTypePrices['rapide'] ?? 0), 2, ',', ' ')); ?> <?php echo htmlspecialchars($settings['currency'] ?? 'MAD'); ?></li>
+                <li><strong>Colis normal:</strong> <?php echo htmlspecialchars(number_format((float)($packageTypePrices['normal'] ?? 0), 2, ',', ' ')); ?> <?php echo htmlspecialchars($settings['currency'] ?? 'MAD'); ?></li>
             </ul>
         </div>
         
@@ -445,20 +457,20 @@ try {
                 <label class="package-type <?php echo ($_POST['package_type'] ?? 'normal') == 'particulier' ? 'active' : ''; ?>">
                     <input type="radio" name="package_type" value="particulier" <?php echo ($_POST['package_type'] ?? 'normal') == 'particulier' ? 'checked' : ''; ?>>
                     <div class="package-type-icon">👤</div>
-                    <div class="package-type-title">Particulier</div>
-                    <div class="package-type-desc">24-48h</div>
+                    <div class="package-type-title">Colis passager</div>
+                    <div class="package-type-desc"><?php echo number_format((float)($packageTypePrices['particulier'] ?? 0), 2, ',', ' '); ?> <?php echo htmlspecialchars($settings['currency'] ?? 'MAD'); ?></div>
                 </label>
                 <label class="package-type <?php echo ($_POST['package_type'] ?? 'normal') == 'rapide' ? 'active' : ''; ?>">
                     <input type="radio" name="package_type" value="rapide" <?php echo ($_POST['package_type'] ?? 'normal') == 'rapide' ? 'checked' : ''; ?>>
                     <div class="package-type-icon">⚡</div>
-                    <div class="package-type-title">Rapide</div>
-                    <div class="package-type-desc">12-24h</div>
+                    <div class="package-type-title">Colis express</div>
+                    <div class="package-type-desc"><?php echo number_format((float)($packageTypePrices['rapide'] ?? 0), 2, ',', ' '); ?> <?php echo htmlspecialchars($settings['currency'] ?? 'MAD'); ?></div>
                 </label>
                 <label class="package-type <?php echo ($_POST['package_type'] ?? 'normal') == 'normal' ? 'active' : ''; ?>">
                     <input type="radio" name="package_type" value="normal" <?php echo ($_POST['package_type'] ?? 'normal') == 'normal' ? 'checked' : ''; ?>>
                     <div class="package-type-icon">📦</div>
-                    <div class="package-type-title">Normal</div>
-                    <div class="package-type-desc">48-72h</div>
+                    <div class="package-type-title">Colis normal</div>
+                    <div class="package-type-desc"><?php echo number_format((float)($packageTypePrices['normal'] ?? 0), 2, ',', ' '); ?> <?php echo htmlspecialchars($settings['currency'] ?? 'MAD'); ?></div>
                 </label>
             </div>
             

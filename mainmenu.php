@@ -23,12 +23,13 @@
 			</ul>
 		</li>		<li <?php echo (preg_match("#Ramassage Agences#",$_SESSION['roles']) OR $_SESSION['type'] == "dlm")?'':'style="display:none;"';?>><a href="shipramassages.php" class="<?php if(basename($_SERVER['PHP_SELF']) == "shipramassages.php"){echo 'active';}?>"><i class="fa fa-truck"></i>Ramassage Agences</a></li>
 		<li <?php echo (preg_match("#Clients|Frais de livraison#",$_SESSION['roles']))?'':'style="display:none;"';?>>
-			<a href="javascript:;" class="<?php echo preg_match("#^(clients.php|clientfees.php|gshippingfees.php)$#",basename($_SERVER['PHP_SELF']))?'active':'';?>"><i class="fa fa-user-tie"></i>Clients</a>
+			<a href="javascript:;" class="<?php echo preg_match("#^(clients.php|clientfees.php|gshippingfees.php|parcelprices.php)$#",basename($_SERVER['PHP_SELF']))?'active':'';?>"><i class="fa fa-user-tie"></i>Clients</a>
 			<i class="fa fa-angle-down"></i>
-			<ul style="<?php echo preg_match("#^(clients.php|clientfees.php|gshippingfees.php)$#",basename($_SERVER['PHP_SELF']))?'display:block;':'';?>">
+			<ul style="<?php echo preg_match("#^(clients.php|clientfees.php|gshippingfees.php|parcelprices.php)$#",basename($_SERVER['PHP_SELF']))?'display:block;':'';?>">
 				<li <?php echo (preg_match("#Clients#",$_SESSION['roles']))?'':'style="display:none;"';?>><a href="clients.php" class="<?php if(basename($_SERVER['PHP_SELF']) == "clients.php"){echo 'active';}?>">Clients <span class="lx-clients-notif"></span></a></li>
 				<li <?php echo (preg_match("#Frais de livraison#",$_SESSION['roles']))?'':'style="display:none;"';?>><a href="clientfees.php" class="<?php if(basename($_SERVER['PHP_SELF']) == "clientfees.php"){echo 'active';}?>">Frais de livraison</a></li>
 				<li <?php echo (preg_match("#Frais de livraison#",$_SESSION['roles']))?'':'style="display:none;"';?>><a href="gshippingfees.php" class="<?php if(basename($_SERVER['PHP_SELF']) == "gshippingfees.php"){echo 'active';}?>">Frais par ville</a></li>
+				<li <?php echo (preg_match("#Frais de livraison#",$_SESSION['roles']))?'':'style="display:none;"';?>><a href="parcelprices.php" class="<?php if(basename($_SERVER['PHP_SELF']) == "parcelprices.php"){echo 'active';}?>">Tarifs des colis</a></li>
 			</ul>
 		</li>
 		<li <?php echo (preg_match("#Envois|Stocks|Emballages#",$_SESSION['roles']))?'':'style="display:none;"';?>>

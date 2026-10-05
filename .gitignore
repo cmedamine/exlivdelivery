@@ -15,6 +15,11 @@ composer.lock
 
 # Fichiers de configuration sensibles
 config.php.bak
+config_installed.php
+
+# Generated distribution archives (source files remain tracked)
+classes.zip
+dist/*.zip
 
 # IDE
 .vscode/

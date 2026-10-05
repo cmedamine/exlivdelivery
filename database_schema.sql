@@ -334,6 +334,16 @@ CREATE TABLE IF NOT EXISTS `packaging` (
   KEY `trash` (`trash`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Tarifs appliqués aux colis selon leur type (fees snapshot on each command)
+CREATE TABLE IF NOT EXISTS `package_type_prices` (
+  `package_type` enum('particulier','rapide','normal') NOT NULL,
+  `price` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `active` enum('0','1') NOT NULL DEFAULT '1',
+  PRIMARY KEY (`package_type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+INSERT IGNORE INTO `package_type_prices` (`package_type`,`price`,`active`) VALUES
+('particulier',0.00,'1'),('rapide',0.00,'1'),('normal',0.00,'1');
+
 -- ============================================
 -- Table: products
 -- Description: Produits
